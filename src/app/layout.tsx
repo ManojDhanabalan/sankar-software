@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Outfit, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-const outfit = Outfit({
+const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
 });
@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${outfit.variable} ${geistMono.variable} antialiased font-sans`}
+        className={`${inter.variable} ${geistMono.variable} antialiased font-sans`}
       >
         <AuthProvider>
           <TooltipProvider>

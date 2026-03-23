@@ -6,14 +6,16 @@ import type { DailyEntry, Site } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Calendar, FileText, Users, Building2, ChevronRight, X, DollarSign, PackageSearch } from "lucide-react";
+import { Loader2, Search, Calendar, FileText, Users, Building2, ChevronRight, X, DollarSign, PackageSearch, IndianRupee } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
+import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 export default function ReportsPage() {
+  const router = useRouter();
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +99,7 @@ export default function ReportsPage() {
   };
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-slate-50"><Loader2 className="w-12 h-12 animate-spin text-blue-600" /></div>;
+    return <div className="flex h-screen items-center justify-center bg-slate-50"><Loader2 className="w-12 h-12 animate-spin text-maroon-600" /></div>;
   }
 
   return (
@@ -105,7 +107,7 @@ export default function ReportsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-slate-200 pb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tightest uppercase">
-            Data <span className="text-blue-600">Analytics</span>
+            Data <span className="text-maroon-600">Analytics</span>
           </h1>
           <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">
             Infrastructure logs & financial history
@@ -216,9 +218,9 @@ export default function ReportsPage() {
                             <div className="font-black text-slate-900 uppercase tracking-tightest">{format(parseISO(entry.date), "dd MMM yyyy")}</div>
                             <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">{entry.time}</div>
                           </td>
-                          <td className="px-8 py-6 font-black text-blue-600 uppercase tracking-tightest group-hover:translate-x-1 transition-transform">{sName}</td>
+                          <td className="px-8 py-6 font-black text-maroon-600 uppercase tracking-tightest group-hover:translate-x-1 transition-transform">{sName}</td>
                           <td className="px-8 py-6 text-center">
-                            <Button size="sm" variant="outline" className="h-9 px-5 text-[9px] font-black uppercase tracking-widest rounded-2xl bg-indigo-50/50 border-indigo-100 text-indigo-600 hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-200 transition-all active:scale-95" onClick={() => openModal(entry, "workers")}>
+                            <Button size="sm" variant="outline" className="h-9 px-5 text-[9px] font-black uppercase tracking-widest rounded-2xl bg-maroon-50/50 border-maroon-100 text-maroon-800 hover:bg-maroon-800 hover:text-white hover:shadow-lg hover:shadow-maroon-200 transition-all active:scale-95" onClick={() => openModal(entry, "workers")}>
                               {entry.workers?.length || 0} Records
                             </Button>
                           </td>
@@ -276,9 +278,9 @@ export default function ReportsPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-50 bg-white">
                     {workersList.map((worker) => (
-                      <tr key={worker.name} className="hover:bg-blue-50/30 transition-all duration-300 cursor-pointer group" onClick={() => window.location.href = `/admin/reports/worker/${encodeURIComponent(worker.name)}`}>
-                        <td className="px-8 py-6 font-black text-slate-900 flex items-center gap-4 group-hover:text-blue-600 uppercase tracking-tightest">
-                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                      <tr key={worker.name} className="hover:bg-maroon-50/30 transition-all duration-300 cursor-pointer group" onClick={() => router.push(`/admin/reports/worker/${encodeURIComponent(worker.name)}`)}>
+                        <td className="px-8 py-6 font-black text-slate-900 flex items-center gap-4 group-hover:text-maroon-600 uppercase tracking-tightest">
+                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-maroon-600 group-hover:text-white transition-all">
                              <Users className="w-5 h-5" />
                           </div>
                           {worker.name}
@@ -310,11 +312,11 @@ export default function ReportsPage() {
                 <Link key={site.id} href={`/admin/reports/site/${site.id}`}>
                   <Card className="hover:shadow-2xl transition-all duration-500 cursor-pointer border-0 shadow-sm rounded-[2.5rem] group relative overflow-hidden bg-white h-full transform hover:-translate-y-2">
                     <div className={cn("absolute top-6 right-6 px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-white rounded-full shadow-lg", 
-                      site.status === "Completed" ? "bg-emerald-500 shadow-emerald-200" : "bg-blue-600 shadow-blue-200")}>
+                      site.status === "Completed" ? "bg-emerald-500 shadow-emerald-200" : "bg-maroon-600 shadow-maroon-200")}>
                        {site.status || "Ongoing"}
                     </div>
                     <CardContent className="p-10 text-center space-y-6">
-                      <div className="w-20 h-20 bg-slate-50 text-slate-400 rounded-3xl flex items-center justify-center mx-auto group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-2xl group-hover:shadow-blue-200 transition-all duration-500 transform group-hover:-rotate-6">
+                      <div className="w-20 h-20 bg-slate-50 text-slate-400 rounded-3xl flex items-center justify-center mx-auto group-hover:bg-maroon-600 group-hover:text-white group-hover:shadow-2xl group-hover:shadow-maroon-200 transition-all duration-500 transform group-hover:-rotate-6">
                         <Building2 className="w-10 h-10" />
                       </div>
                       <div>
@@ -336,9 +338,9 @@ export default function ReportsPage() {
           <DialogHeader className="bg-slate-900 p-10 text-white relative">
             <div className="space-y-2">
               <DialogTitle className="text-3xl font-black uppercase tracking-tightest flex items-center gap-5">
-                {modalType === "workers" && <><div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center"><Users className="w-7 h-7" /></div> Labour Audit</>}
+                {modalType === "workers" && <><div className="w-12 h-12 bg-maroon-800 rounded-2xl flex items-center justify-center"><Users className="w-7 h-7" /></div> Labour Audit</>}
                 {modalType === "materials" && <><div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center"><PackageSearch className="w-7 h-7" /></div> Stock Ledger</>}
-                {modalType === "expenses" && <><div className="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center"><DollarSign className="w-7 h-7" /></div> Incidentals</>}
+                {modalType === "expenses" && <><div className="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center"><IndianRupee className="w-7 h-7" /></div> Incidentals</>}
               </DialogTitle>
               <DialogDescription className="text-slate-500 font-black uppercase tracking-[0.1em] text-xs pt-4 flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5" />
@@ -439,7 +441,7 @@ export default function ReportsPage() {
                 </div>
                 <div>
                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Project Index</p>
-                   <p className="text-sm font-black text-blue-600 uppercase">{sites.find(s => s.id === selectedEntry?.siteId)?.siteName}</p>
+                   <p className="text-sm font-black text-maroon-600 uppercase">{sites.find(s => s.id === selectedEntry?.siteId)?.siteName}</p>
                 </div>
              </div>
              <div className="text-right">

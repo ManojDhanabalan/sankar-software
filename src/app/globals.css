@@ -39,6 +39,17 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-maroon-50: oklch(0.97 0.01 30);
+  --color-maroon-100: oklch(0.94 0.02 30);
+  --color-maroon-200: oklch(0.88 0.04 30);
+  --color-maroon-300: oklch(0.8 0.08 30);
+  --color-maroon-400: oklch(0.7 0.12 30);
+  --color-maroon-500: oklch(0.6 0.15 30);
+  --color-maroon-600: oklch(0.45 0.18 30);
+  --color-maroon-700: oklch(0.35 0.12 30);
+  --color-maroon-800: oklch(0.25 0.08 30);
+  --color-maroon-900: oklch(0.15 0.05 30);
+  
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,39 +60,39 @@
 }
 
 :root {
-  --background: oklch(0.985 0.005 240);
-  --foreground: oklch(0.15 0.02 260);
+  --background: oklch(0.99 0.005 30);
+  --foreground: oklch(0.15 0.05 30);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 260);
+  --card-foreground: oklch(0.15 0.05 30);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 260);
-  --primary: oklch(0.4 0.2 260); /* Deep Royal Navy */
+  --popover-foreground: oklch(0.15 0.05 30);
+  --primary: oklch(0.35 0.12 30); /* Premium Maroon */
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.02 260);
-  --secondary-foreground: oklch(0.2 0.1 260);
-  --muted: oklch(0.96 0.01 260);
-  --muted-foreground: oklch(0.45 0.02 260);
-  --accent: oklch(0.92 0.03 260);
-  --accent-foreground: oklch(0.2 0.1 260);
-  --destructive: oklch(0.55 0.25 25);
-  --border: oklch(0.92 0.015 260);
-  --input: oklch(0.92 0.015 260);
-  --ring: oklch(0.4 0.2 260);
+  --secondary: oklch(0.95 0.03 30);
+  --secondary-foreground: oklch(0.2 0.08 30);
+  --muted: oklch(0.96 0.01 30);
+  --muted-foreground: oklch(0.45 0.05 30);
+  --accent: oklch(0.92 0.04 30);
+  --accent-foreground: oklch(0.2 0.08 30);
+  --destructive: oklch(0.55 0.2 30);
+  --border: oklch(0.92 0.02 30);
+  --input: oklch(0.92 0.02 30);
+  --ring: oklch(0.35 0.12 30);
   --radius: 1rem;
   
   /* CONSTRUCTION ACCENTS */
-  --labour: oklch(0.6 0.2 280); /* Electric Violet */
-  --material: oklch(0.7 0.15 160); /* Emerald Teal */
-  --expense: oklch(0.75 0.15 60); /* Sunrise Amber */
+  --labour: oklch(0.5 0.15 20); /* Deep Rust Red for Labour */
+  --material: oklch(0.5 0.1 50); /* Sienna Gold for Materials */
+  --expense: oklch(0.4 0.1 30); /* Burnt Red for Expenses */
   
-  --sidebar: oklch(0.15 0.03 260); /* Dark Sidebar */
-  --sidebar-foreground: oklch(0.95 0.01 260);
-  --sidebar-primary: oklch(0.5 0.25 260);
+  --sidebar: oklch(0.12 0.04 30); /* Dark Maroon Sidebar */
+  --sidebar-foreground: oklch(0.95 0.01 30);
+  --sidebar-primary: oklch(0.45 0.15 30);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.25 0.03 260);
-  --sidebar-accent-foreground: oklch(0.98 0.005 260);
-  --sidebar-border: oklch(0.2 0.03 260);
-  --sidebar-ring: oklch(0.5 0.25 260);
+  --sidebar-accent: oklch(0.2 0.05 30);
+  --sidebar-accent-foreground: oklch(0.98 0.005 30);
+  --sidebar-border: oklch(0.2 0.05 30);
+  --sidebar-ring: oklch(0.45 0.15 30);
 }
 
 .dark {

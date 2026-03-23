@@ -33,7 +33,7 @@ export default function AdminSidebar() {
         {/* Logo Section */}
         <div className="p-8">
           <Link href="/admin" className="flex flex-col gap-4">
-            <div className="w-16 h-16 relative overflow-hidden rounded-2xl shadow-xl shadow-blue-900/40 ring-1 ring-white/10 group bg-white p-1">
+            <div className="w-16 h-16 relative overflow-hidden rounded-2xl shadow-xl shadow-maroon-900/40 ring-1 ring-white/10 group bg-white p-1">
               <img 
                 src="/logo.jpg" 
                 alt="SS Construction Logo" 
@@ -71,7 +71,7 @@ export default function AdminSidebar() {
                 className={cn(
                   "group flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[13px] font-bold transition-all duration-300 relative overflow-hidden",
                   isActive
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                    ? "bg-maroon-600 text-white shadow-lg shadow-maroon-600/20"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 )}
               >

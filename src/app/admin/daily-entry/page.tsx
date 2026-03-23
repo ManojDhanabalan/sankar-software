@@ -117,14 +117,14 @@ export default function DailyEntryPage() {
     setSubmitting(false);
   };
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-slate-50"><Loader2 className="w-12 h-12 animate-spin text-blue-600" /></div>;
+  if (loading) return <div className="flex h-screen items-center justify-center bg-slate-50"><Loader2 className="w-12 h-12 animate-spin text-maroon-600" /></div>;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-32 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-slate-200 pb-8">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tightest uppercase">
-            Field <span className="text-blue-600">Operations</span>
+            Field <span className="text-maroon-600">Operations</span>
           </h1>
           <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">
             Daily logs for labor, material & expense
@@ -132,7 +132,7 @@ export default function DailyEntryPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-blue-200 transition-colors">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-maroon-200 transition-colors">
             <Calendar className="w-4 h-4 text-slate-400" />
             <Input type="date" className="border-0 p-0 h-auto bg-transparent focus-visible:ring-0 font-bold text-sm" value={date} onChange={(e) => setDate(e.target.value)} />
           </div>
@@ -167,12 +167,12 @@ export default function DailyEntryPage() {
               
               {!selectedSite && (
                 <Select onValueChange={(val: any) => setSelectedSiteId(val || "")}>
-                  <SelectTrigger className="w-full sm:w-80 h-14 bg-white/5 border-white/10 rounded-2xl font-black uppercase text-xs tracking-widest focus:ring-blue-500">
+                  <SelectTrigger className="w-full sm:w-80 h-14 bg-white/5 border-white/10 rounded-2xl font-black uppercase text-xs tracking-widest focus:ring-maroon-500">
                     <SelectValue placeholder="DEPLOY TO SITE" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-900 border-white/10 text-white rounded-2xl overflow-hidden">
                     {sites.map((site) => (
-                      <SelectItem key={site.id} value={site.id} className="focus:bg-blue-600 focus:text-white py-4 font-black uppercase text-xs tracking-widest border-b border-white/5 last:border-0 cursor-pointer">
+                      <SelectItem key={site.id} value={site.id} className="focus:bg-maroon-600 focus:text-white py-4 font-black uppercase text-xs tracking-widest border-b border-white/5 last:border-0 cursor-pointer">
                         {site.siteName} {site.status === "Completed" && "✓"}
                       </SelectItem>
                     ))}
@@ -245,7 +245,7 @@ export default function DailyEntryPage() {
                     {labour.paymentStatus === "Partial" && (
                        <div className="w-full md:w-32 space-y-1.5 animate-in zoom-in-95">
                           <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">Paid Val</Label>
-                          <Input type="number" className="h-12 rounded-xl border-blue-100 bg-blue-50/30 font-black text-blue-600" value={labour.paidAmount} onChange={(e) => updateWorker(idx, "paidAmount", e.target.value)} />
+                          <Input type="number" className="h-12 rounded-xl border-maroon-100 bg-maroon-50/30 font-black text-maroon-600" value={labour.paidAmount} onChange={(e) => updateWorker(idx, "paidAmount", e.target.value)} />
                        </div>
                     )}
 
@@ -347,11 +347,11 @@ export default function DailyEntryPage() {
           <div className="pt-12">
              <Button onClick={handleSubmit} className="w-full h-24 rounded-[3rem] bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.3em] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] transition-all transform active:scale-95 group overflow-hidden relative" disabled={submitting}>
                 {submitting ? (
-                  <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+                  <Loader2 className="w-10 h-10 animate-spin text-maroon-500" />
                 ) : (
                   <>
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                    <Save className="w-8 h-8 mr-6 group-hover:rotate-12 transition-transform duration-500 text-blue-500" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-maroon-600/10 via-transparent to-maroon-700/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    <Save className="w-8 h-8 mr-6 group-hover:rotate-12 transition-transform duration-500 text-maroon-500" />
                     Commit Daily Transaction
                   </>
                 )}
@@ -366,11 +366,11 @@ export default function DailyEntryPage() {
               <div className="flex items-center gap-12">
                 <div className="hidden xl:block">
                    <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1.5 italic">Protocol Target</p>
-                   <p className="text-sm font-black text-blue-400 uppercase tracking-tighter">{selectedSite.siteName}</p>
+                   <p className="text-sm font-black text-maroon-400 uppercase tracking-tighter">{selectedSite.siteName}</p>
                 </div>
                 <div className="flex gap-8 sm:gap-14">
                   <div>
-                    <p className="text-[9px] font-black text-indigo-400/60 uppercase leading-none mb-2 tracking-widest">Labour</p>
+                    <p className="text-[9px] font-black text-maroon-400/60 uppercase leading-none mb-2 tracking-widest">Labour</p>
                     <p className="text-2xl font-black tracking-tightest">₹{totalLabour.toLocaleString()}</p>
                   </div>
                   <div className="h-10 w-[2px] bg-white/5 self-center" />
@@ -386,7 +386,7 @@ export default function DailyEntryPage() {
                 </div>
               </div>
 
-              <div className="px-10 py-4 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2rem] shadow-2xl shadow-blue-500/30 ring-1 ring-white/20 transform -translate-y-2 sm:translate-y-0">
+              <div className="px-10 py-4 bg-gradient-to-br from-maroon-600 to-maroon-800 rounded-[2rem] shadow-2xl shadow-maroon-500/30 ring-1 ring-white/20 transform -translate-y-2 sm:translate-y-0">
                  <p className="text-[9px] font-black text-white/50 uppercase leading-none mb-2 tracking-[0.2em] text-center">Operational Exposure</p>
                  <p className="text-3xl font-black tracking-tightest">₹{totalAmount.toLocaleString('en-IN')}</p>
               </div>

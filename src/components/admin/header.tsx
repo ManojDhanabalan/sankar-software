@@ -36,26 +36,16 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const menuItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/sites", label: "Sites", icon: Building2 },
-  { href: "/admin/labour", label: "Labour", icon: Users },
-  { href: "/admin/materials", label: "Materials", icon: Package },
-  { href: "/admin/daily-log", label: "Daily Log", icon: CalendarDays },
-  { href: "/admin/work-progress", label: "Work Progress", icon: Hammer },
-  { href: "/admin/expenses", label: "Expenses", icon: DollarSign },
-  { href: "/admin/reports", label: "Reports", icon: FileBarChart },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/site-setup", label: "Site Setup", icon: Building2 },
+  { href: "/admin/daily-entry", label: "Daily Entry", icon: CalendarDays },
+  { href: "/admin/reports", label: "View Records", icon: FileBarChart },
 ];
 
 const pageTitle: Record<string, string> = {
-  "/admin": "Dashboard",
-  "/admin/sites": "Site Management",
-  "/admin/labour": "Labour Management",
-  "/admin/materials": "Materials",
-  "/admin/daily-log": "Daily Log",
-  "/admin/work-progress": "Work Progress",
-  "/admin/expenses": "Expenses",
-  "/admin/reports": "Reports",
-  "/admin/settings": "Settings",
+  "/admin": "Dashboard Overview",
+  "/admin/site-setup": "Infrastructure Setup",
+  "/admin/daily-entry": "Resource Daily Entry",
+  "/admin/reports": "Data Analytics Archive",
 };
 
 export default function AdminHeader() {
@@ -82,7 +72,7 @@ export default function AdminHeader() {
               <SheetTitle className="sr-only">Nav</SheetTitle>
               <div className="p-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/40">
+                  <div className="w-10 h-10 bg-maroon-600 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-900/40">
                     <Building2 className="w-5 h-5 text-white" />
                   </div>
                   <span className="text-sm font-black text-white uppercase tracking-tight">SS Construction</span>
@@ -97,7 +87,7 @@ export default function AdminHeader() {
                       href={item.href}
                       className={cn(
                         "flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all",
-                        isActive ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
+                        isActive ? "bg-maroon-600 text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
                       )}
                     >
                       <item.icon className="w-5 h-5" />
@@ -117,8 +107,8 @@ export default function AdminHeader() {
 
         <div className="flex items-center gap-3">
           <Button variant="outline" size="icon" className="hidden sm:flex w-10 h-10 rounded-xl border-slate-200 hover:bg-slate-50 relative group">
-            <Bell className="w-4.5 h-4.5 text-slate-400 group-hover:text-blue-600 transition-colors" />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-blue-600 rounded-full border-2 border-white" />
+            <Bell className="w-4.5 h-4.5 text-slate-400 group-hover:text-maroon-600 transition-colors" />
+            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-maroon-600 rounded-full border-2 border-white" />
           </Button>
 
           <DropdownMenu>

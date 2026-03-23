@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, LogIn, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,10 +19,11 @@ export default function AdminLoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   // Redirect if already admin
-  if (!loading && user && isAdmin) {
-    router.push("/admin");
-    return null;
-  }
+  useEffect(() => {
+    if (!loading && user && isAdmin) {
+      router.push("/admin");
+    }
+  }, [user, isAdmin, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,14 +46,14 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-maroon-900 via-maroon-800 to-slate-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzEuNjU2IDAgMyAxLjM0NCAzIDN2MjRjMCAxLjY1Ni0xLjM0NCAzLTMgM0gxMmMtMS42NTYgMC0zLTEuMzQ0LTMtM1YyMWMwLTEuNjU2IDEuMzQ0LTMgMy0zaDI0eiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
 
       <Card className="relative w-full max-w-md border-0 shadow-2xl rounded-3xl bg-white/95 backdrop-blur-xl">
         <CardContent className="p-8">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/30 mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-maroon-600 to-maroon-800 rounded-2xl flex items-center justify-center shadow-lg shadow-maroon-600/30 mb-4">
               <Building2 className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -100,7 +101,7 @@ export default function AdminLoginPage() {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-2xl h-12 text-base shadow-lg shadow-blue-600/20"
+              className="w-full bg-gradient-to-r from-maroon-600 to-maroon-700 hover:from-maroon-700 hover:to-maroon-800 rounded-2xl h-12 text-base shadow-lg shadow-maroon-600/20"
             >
               {submitting ? (
                 "Signing in..."

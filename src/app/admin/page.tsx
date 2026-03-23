@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDashboardStats } from "@/lib/firestore";
 import type { DashboardStats } from "@/lib/types";
-import { Building2, Users, Package, DollarSign } from "lucide-react";
+import { Building2, Users, Package, IndianRupee } from "lucide-react";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -48,12 +48,12 @@ export default function AdminDashboard() {
     <div className="space-y-10">
       <div className="relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 lg:p-12 text-white shadow-2xl">
         {/* Abstract Background Shapes */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-600/10 rounded-full blur-3xl -ml-20 -mb-20" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-maroon-600/20 rounded-full blur-3xl -mr-20 -mt-20" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-maroon-800/10 rounded-full blur-3xl -ml-20 -mb-20" />
         
         <div className="relative z-10">
           <h2 className="text-2xl lg:text-4xl font-black tracking-tightest">
-            Welcome back, <span className="text-blue-400">Chief!</span> 👋
+            Welcome back, <span className="text-maroon-400">Chief!</span> 👋
           </h2>
           <p className="text-slate-400 mt-2 text-sm sm:text-base font-bold uppercase tracking-wider">
             Consolidated Site Analytics & Payroll Overview
@@ -72,24 +72,24 @@ export default function AdminDashboard() {
         {/* Total Sites */}
         <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white">
           <CardContent className="p-8 relative">
-             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-all w-24 h-24">
-                <img src="/logo.jpg" alt="" className="w-full h-full object-contain mix-blend-multiply" />
+             <div className="w-10 h-10 bg-maroon-50 rounded-xl flex items-center justify-center mb-6 text-maroon-600">
+                <Building2 className="w-5 h-5" />
              </div>
              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Global Status</p>
-             <h3 className="text-4xl font-black text-slate-900 mt-3">{stats?.totalSites || 0}</h3>
-             <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-tighter">Registered Sites</p>
+             <h3 className="text-3xl font-black text-slate-900 mt-2">{stats?.totalSites || 0}</h3>
+             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-slate-500">Registered Sites</p>
           </CardContent>
         </Card>
 
         {/* Today Labour Cost */}
-        <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-indigo-600 text-white">
+        <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-maroon-800 text-white">
           <CardContent className="p-8">
              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-6">
                 <Users className="w-5 h-5 text-white" />
              </div>
-             <p className="text-[11px] font-black text-indigo-200 uppercase tracking-widest">Today Labour</p>
+             <p className="text-[11px] font-black text-maroon-100 uppercase tracking-widest">Today Labour</p>
              <h3 className="text-3xl font-black mt-2">₹{(stats?.todayLabourCost || 0).toLocaleString('en-IN')}</h3>
-             <div className="h-1 w-12 bg-indigo-400 rounded-full mt-4" />
+             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-maroon-50">Daily cost projection</p>
           </CardContent>
         </Card>
 
@@ -101,15 +101,15 @@ export default function AdminDashboard() {
              </div>
              <p className="text-[11px] font-black text-emerald-200 uppercase tracking-widest">Today Materials</p>
              <h3 className="text-3xl font-black mt-2">₹{(stats?.todayMaterialCost || 0).toLocaleString('en-IN')}</h3>
-             <div className="h-1 w-12 bg-emerald-400 rounded-full mt-4" />
+             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-emerald-100">Daily material usage</p>
           </CardContent>
         </Card>
 
         {/* Total Pending */}
         <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-red-600 text-white shadow-red-600/20">
           <CardContent className="p-8">
-             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-6 animate-bounce">
-                <DollarSign className="w-5 h-5 text-white" />
+             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-6 animate-pulse">
+                <IndianRupee className="w-5 h-5 text-white" />
              </div>
              <p className="text-[11px] font-black text-red-200 uppercase tracking-widest">Global Pending</p>
              <h3 className="text-3xl font-black mt-2">₹{(stats?.totalPendingAmount || 0).toLocaleString('en-IN')}</h3>
