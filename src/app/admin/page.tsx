@@ -1,121 +1,221 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { getDashboardStats } from "@/lib/firestore";
-import type { DashboardStats } from "@/lib/types";
-import { Building2, Users, Package, IndianRupee } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getDailyEntries, getSites } from "@/lib/firestore";
+import type { DailyEntry, Site } from "@/lib/types";
+import Link from "next/link";
+import {
+  Users, Package, Cog, Receipt, Building2,
+  TrendingUp, Clock, ChevronRight,
+  Activity, CheckCircle2, Loader2, Plus, FileText
+} from "lucide-react";
+import { format, parseISO, isValid, isAfter, isToday } from "date-fns";
+import { cn, fmtINR } from "@/lib/utils";
+
+const safeFormatDate = (d: string) => {
+  if (!d) return "—";
+  const p = parseISO(d);
+  return isValid(p) ? format(p, "dd MMM yyyy") : "—";
+};
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [entries, setEntries] = useState<DailyEntry[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadStats();
-  }, []);
-
-  const loadStats = async () => {
-    try {
-      const data = await getDashboardStats();
-      setStats(data);
-    } catch (error) {
-      console.error("Error loading dashboard:", error);
-    } finally {
+    async function load() {
+      try {
+        const [eData, sData] = await Promise.all([getDailyEntries(), getSites()]);
+        setEntries(eData || []);
+        setSites(sData || []);
+      } catch (e) { console.error(e); }
       setLoading(false);
     }
-  };
+    load();
+  }, []);
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="border-0 shadow-sm rounded-3xl overflow-hidden">
-              <CardContent className="p-8">
-                <div className="animate-pulse space-y-4">
-                  <div className="h-4 w-20 bg-slate-200 rounded" />
-                  <div className="h-10 w-32 bg-slate-200 rounded" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const allWorkers   = entries.flatMap(e => e.workers   || []);
+  const allMaterials = entries.flatMap(e => e.materials || []);
+  const allMachinery = entries.flatMap(e => e.machinery || []);
+  const allExpenses  = entries.flatMap(e => e.expenses  || []);
+
+  const totalLabour    = allWorkers.reduce((s, w) => s + (Number(w.amount) || 0), 0);
+  const totalMaterials = allMaterials.reduce((s, m) => s + (Number(m.amount) || 0), 0);
+  const totalMachinery = allMachinery.reduce((s, m) => s + (Number(m.amount) || 0), 0);
+  const totalExpenses  = allExpenses.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const grandTotal     = totalLabour + totalMaterials + totalMachinery + totalExpenses;
+  const totalPending   = allWorkers.reduce((s, w) => s + (Number(w.pendingAmount) || 0), 0);
+  const totalPaid      = allWorkers.reduce((s, w) => s + (Number(w.paidAmount) || 0), 0);
+
+  const todayEntries   = entries.filter(e => { try { return isToday(parseISO(e.date)); } catch { return false; } });
+  const todayTotal     = todayEntries.reduce((s, e) => s + (Number(e.totalAmount) || 0), 0);
+  const todayLabour    = todayEntries.flatMap(e => e.workers   || []).reduce((s, w) => s + (Number(w.amount) || 0), 0);
+  const todayMaterials = todayEntries.flatMap(e => e.materials || []).reduce((s, m) => s + (Number(m.amount) || 0), 0);
+
+  const activeSites    = sites.filter(s => !isAfter(new Date(), new Date(s.endDate)));
+  const recentEntries  = [...entries].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-background">
+      <Loader2 className="w-10 h-10 animate-spin text-primary" />
+    </div>
+  );
 
   return (
-    <div className="space-y-10">
-      <div className="relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 lg:p-12 text-white shadow-2xl">
-        {/* Abstract Background Shapes */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-maroon-600/20 rounded-full blur-3xl -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-maroon-800/10 rounded-full blur-3xl -ml-20 -mb-20" />
-        
-        <div className="relative z-10">
-          <h2 className="text-2xl lg:text-4xl font-black tracking-tightest">
-            Welcome back, <span className="text-maroon-400">Chief!</span> 👋
-          </h2>
-          <p className="text-slate-400 mt-2 text-sm sm:text-base font-bold uppercase tracking-wider">
-            Consolidated Site Analytics & Payroll Overview
-          </p>
-          <div className="flex flex-wrap gap-4 mt-8">
-            <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl backdrop-blur-md">
-              <p className="text-[10px] font-black text-slate-500 uppercase">Live Sites</p>
-              <p className="text-xl font-black">{stats?.totalSites || 0}</p>
+    <div className="min-h-screen bg-[#F1F2F4] pb-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 space-y-6 animate-in fade-in duration-400">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/50">Overview</p>
+            <h1 className="text-[22px] font-bold text-[#1A1A1A]">Dashboard</h1>
+          </div>
+          <Link
+            href="/admin/daily-entry"
+            className="inline-flex items-center gap-2 bg-[#1A1A1A] text-white text-[12px] font-black uppercase tracking-wider px-4 py-2.5 rounded-xl hover:bg-[#333] transition-colors"
+          >
+            <Plus className="w-4 h-4" /> New Entry
+          </Link>
+        </div>
+
+        {/* TODAY banner */}
+        {todayEntries.length > 0 && (
+          <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-xl p-5 flex items-center justify-between shadow-md">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1">Today's Activity</p>
+              <p className="text-[26px] font-bold text-white">{fmtINR(todayTotal)}</p>
+              <p className="text-[11px] text-white/70 mt-1">
+                {todayEntries.length} entr{todayEntries.length > 1 ? 'ies' : 'y'} · Labour {fmtINR(todayLabour)} · Materials {fmtINR(todayMaterials)}
+              </p>
             </div>
+            <Activity className="w-10 h-10 text-white/30" />
+          </div>
+        )}
+
+        {/* 4 Cost Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { label: "Labour Cost",    value: totalLabour,    icon: Users,   color: "text-indigo-600", bg: "bg-indigo-50",  border: "border-indigo-100" },
+            { label: "Material Cost",  value: totalMaterials, icon: Package, color: "text-amber-600",  bg: "bg-amber-50",   border: "border-amber-100"  },
+            { label: "Machinery Cost", value: totalMachinery, icon: Cog,     color: "text-sky-600",    bg: "bg-sky-50",     border: "border-sky-100"    },
+            { label: "Other Expenses", value: totalExpenses,  icon: Receipt, color: "text-violet-600", bg: "bg-violet-50",  border: "border-violet-100" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white rounded-xl border border-[#E5E5E5] p-4 shadow-sm">
+              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center mb-3", s.bg, `border ${s.border}`)}>
+                <s.icon className={cn("w-4 h-4", s.color)} />
+              </div>
+              <p className="text-[9px] font-black uppercase tracking-widest text-[#999] mb-1">{s.label}</p>
+              <p className="text-[20px] font-bold text-[#1A1A1A]">{fmtINR(s.value)}</p>
+              <p className="text-[10px] text-[#999] mt-0.5">₹{s.value.toLocaleString('en-IN')}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Grand Total + Payment */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-xl border-2 border-[#1A1A1A]/10 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-4 h-4 text-[#1A1A1A]" />
+              <p className="text-[9px] font-black uppercase tracking-widest text-[#999]">Grand Total</p>
+            </div>
+            <p className="text-[26px] font-bold text-[#1A1A1A]">{fmtINR(grandTotal)}</p>
+            <p className="text-[10px] text-[#999] mt-0.5">₹{grandTotal.toLocaleString('en-IN')} · {entries.length} entries</p>
+          </div>
+          <div className="bg-white rounded-xl border border-emerald-100 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600/60">Paid</p>
+            </div>
+            <p className="text-[22px] font-bold text-emerald-600">{fmtINR(totalPaid)}</p>
+            <p className="text-[10px] text-emerald-600/40 mt-0.5">
+              ₹{totalPaid.toLocaleString('en-IN')} · {allWorkers.filter(w => w.paymentStatus === "Paid").length} workers
+            </p>
+          </div>
+          <div className="bg-white rounded-xl border border-rose-100 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-4 h-4 text-rose-500" />
+              <p className="text-[9px] font-black uppercase tracking-widest text-rose-500/60">Pending</p>
+            </div>
+            <p className="text-[22px] font-bold text-rose-500">{fmtINR(totalPending)}</p>
+            <p className="text-[10px] text-rose-500/40 mt-0.5">
+              ₹{totalPending.toLocaleString('en-IN')} · {allWorkers.filter(w => w.paymentStatus !== "Paid").length} workers
+            </p>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-1">
-        
-        {/* Total Sites */}
-        <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-white">
-          <CardContent className="p-8 relative">
-             <div className="w-10 h-10 bg-maroon-50 rounded-xl flex items-center justify-center mb-6 text-maroon-600">
-                <Building2 className="w-5 h-5" />
-             </div>
-             <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Global Status</p>
-             <h3 className="text-3xl font-black text-slate-900 mt-2">{stats?.totalSites || 0}</h3>
-             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-slate-500">Registered Sites</p>
-          </CardContent>
-        </Card>
+        {/* Bottom two columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Active Sites */}
+          <div className="bg-white rounded-xl border border-[#E5E5E5] shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#666]" />
+                <h2 className="text-[13px] font-semibold text-[#1A1A1A]">Active Sites</h2>
+              </div>
+              <Link href="/admin/reports?tab=sites" className="text-[10px] font-black text-primary uppercase tracking-wider hover:underline">View All</Link>
+            </div>
+            {activeSites.length === 0 ? (
+              <div className="p-8 text-center text-[12px] text-[#999]">No active sites</div>
+            ) : (
+              <div className="divide-y divide-[#F5F5F5]">
+                {activeSites.slice(0, 5).map(s => {
+                  const siteEntries = entries.filter(e => e.siteId === s.id);
+                  const siteCost = siteEntries.flatMap(e => [...(e.workers||[]), ...(e.materials||[]), ...(e.machinery||[]), ...(e.expenses||[])]).reduce((t, x) => t + (x.amount || 0), 0);
+                  return (
+                    <Link key={s.id} href={`/admin/sites/${s.id}`} className="flex items-center justify-between px-5 py-3 hover:bg-[#FAFAFA] transition-colors">
+                      <div>
+                        <p className="text-[12px] font-bold text-[#1A1A1A] uppercase">{s.siteName}</p>
+                        {s.location && <p className="text-[10px] text-[#999]">{s.location}</p>}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="text-right">
+                          <p className="text-[13px] font-bold text-[#1A1A1A]">{fmtINR(siteCost)}</p>
+                          <p className="text-[10px] text-[#999]">{siteEntries.length} entries</p>
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-[#CCC]" />
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-        {/* Today Labour Cost */}
-        <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-maroon-800 text-white">
-          <CardContent className="p-8">
-             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-6">
-                <Users className="w-5 h-5 text-white" />
-             </div>
-             <p className="text-[11px] font-black text-maroon-100 uppercase tracking-widest">Today Labour</p>
-             <h3 className="text-3xl font-black mt-2">₹{(stats?.todayLabourCost || 0).toLocaleString('en-IN')}</h3>
-             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-maroon-50">Daily cost projection</p>
-          </CardContent>
-        </Card>
-
-        {/* Today Materials */}
-        <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-emerald-600 text-white">
-          <CardContent className="p-8">
-             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-6">
-                <Package className="w-5 h-5 text-white" />
-             </div>
-             <p className="text-[11px] font-black text-emerald-200 uppercase tracking-widest">Today Materials</p>
-             <h3 className="text-3xl font-black mt-2">₹{(stats?.todayMaterialCost || 0).toLocaleString('en-IN')}</h3>
-             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-emerald-100">Daily material usage</p>
-          </CardContent>
-        </Card>
-
-        {/* Total Pending */}
-        <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2rem] overflow-hidden bg-red-600 text-white shadow-red-600/20">
-          <CardContent className="p-8">
-             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-6 animate-pulse">
-                <IndianRupee className="w-5 h-5 text-white" />
-             </div>
-             <p className="text-[11px] font-black text-red-200 uppercase tracking-widest">Global Pending</p>
-             <h3 className="text-3xl font-black mt-2">₹{(stats?.totalPendingAmount || 0).toLocaleString('en-IN')}</h3>
-             <p className="text-[10px] font-bold mt-2 uppercase tracking-tighter text-red-100">Across all workers</p>
-          </CardContent>
-        </Card>
+          {/* Recent Entries */}
+          <div className="bg-white rounded-xl border border-[#E5E5E5] shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-[#E5E5E5] bg-[#FAFAFA] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#666]" />
+                <h2 className="text-[13px] font-semibold text-[#1A1A1A]">Recent Entries</h2>
+              </div>
+              <Link href="/admin/reports" className="text-[10px] font-black text-primary uppercase tracking-wider hover:underline">View All</Link>
+            </div>
+            {recentEntries.length === 0 ? (
+              <div className="p-8 text-center text-[12px] text-[#999]">No entries yet</div>
+            ) : (
+              <div className="divide-y divide-[#F5F5F5]">
+                {recentEntries.map(e => {
+                  const siteName = sites.find(s => s.id === e.siteId)?.siteName || "Unknown";
+                  const workerCount = (e.workers || []).length;
+                  return (
+                    <div key={e.id} className="flex items-center justify-between px-5 py-3 hover:bg-[#FAFAFA] transition-colors">
+                      <div>
+                        <p className="text-[12px] font-bold text-[#1A1A1A] uppercase">{siteName}</p>
+                        <p className="text-[10px] text-[#999]">{safeFormatDate(e.date)} · {workerCount} worker{workerCount !== 1 ? 's' : ''}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[13px] font-bold text-[#1A1A1A]">{fmtINR(e.totalAmount || 0)}</p>
+                        <p className="text-[10px] text-[#999]">{e.time}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
 
       </div>
     </div>

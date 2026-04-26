@@ -85,15 +85,16 @@ export default function ServicesPage() {
   return (
     <div className="pt-20 lg:pt-24">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-sm font-semibold text-blue-400 tracking-wider uppercase">
+      <section className="bg-primary py-20 lg:py-28 relative overflow-hidden border-b">
+        <div className="absolute inset-0 bg-primary-foreground/5 mix-blend-overlay" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <span className="text-sm font-bold text-primary-foreground/80 tracking-widest uppercase">
             Our Services
           </span>
-          <h1 className="mt-3 text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h1 className="mt-4 text-4xl lg:text-6xl font-bold text-primary-foreground tracking-tighter text-balance">
             Comprehensive Construction Solutions
           </h1>
-          <p className="mt-4 text-slate-300 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-primary-foreground/90 max-w-2xl mx-auto text-balance">
             End‑to‑end construction services tailored to deliver excellence in
             every project we undertake.
           </p>
@@ -101,13 +102,13 @@ export default function ServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-20 lg:py-28 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
             {services.map((service, idx) => (
               <Card
                 key={service.title}
-                className="border-0 shadow-sm rounded-2xl hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="border border-border shadow-sm rounded-2xl hover:shadow-xl hover:border-primary/20 transition-all duration-300 overflow-hidden bg-card"
               >
                 <CardContent className="p-0">
                   <div
@@ -115,30 +116,30 @@ export default function ServicesPage() {
                       idx % 2 === 1 ? "md:flex-row-reverse" : ""
                     }`}
                   >
-                    <div className="p-8 lg:p-10">
-                      <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl flex items-center justify-center mb-5">
-                        <service.icon className="w-7 h-7 text-blue-600" />
+                    <div className="p-8 lg:p-12">
+                      <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                        <service.icon className="w-8 h-8 text-primary" />
                       </div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                      <h3 className="text-3xl font-bold text-foreground mb-4 tracking-tight">
                         {service.title}
                       </h3>
-                      <p className="text-slate-600 leading-relaxed mb-6">
+                      <p className="text-muted-foreground leading-relaxed mb-6">
                         {service.desc}
                       </p>
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {service.features.map((f) => (
                           <li
                             key={f}
-                            className="flex items-center gap-2 text-sm text-slate-600"
+                            className="flex items-center gap-3 text-sm text-foreground font-medium"
                           >
-                            <CheckCircle2 className="w-4 h-4 text-blue-500 shrink-0" />
+                            <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                             {f}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div className="bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center min-h-[260px]">
-                      <service.icon className="w-24 h-24 text-slate-300" />
+                    <div className="bg-muted flex items-center justify-center min-h-[300px]">
+                      <service.icon className="w-32 h-32 text-border" />
                     </div>
                   </div>
                 </CardContent>
@@ -149,21 +150,21 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 lg:py-28 bg-muted/30 border-t">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-3xl lg:text-5xl font-bold text-foreground tracking-tight text-balance">
             Ready to Start Your Project?
           </h2>
-          <p className="mt-4 text-slate-600">
+          <p className="mt-6 text-lg text-muted-foreground text-balance">
             Get in touch with our team for a free consultation and detailed
             estimate.
           </p>
-          <Link href="/contact" className="mt-8 inline-block">
+          <Link href="/contact" className="mt-10 inline-block">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl h-12 px-8"
+              className="rounded-full h-14 px-8 text-base shadow-lg hover:shadow-xl transition-all"
             >
-              Get a Free Quote <ArrowRight className="ml-2 w-4 h-4" />
+              Get a Free Quote <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </Link>
         </div>

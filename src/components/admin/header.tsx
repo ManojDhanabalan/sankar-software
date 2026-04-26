@@ -54,7 +54,7 @@ export default function AdminHeader() {
   const title = pageTitle[pathname] || "Admin Panel";
 
   return (
-    <header className="sticky top-0 z-30 bg-white/60 backdrop-blur-2xl border-b border-slate-200/50">
+    <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-2xl border-b border-border/50">
       <div className="flex items-center justify-between h-18 px-4 sm:px-6 lg:px-8">
         
         <div className="flex items-center gap-4">
@@ -63,19 +63,19 @@ export default function AdminHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden w-10 h-10 rounded-xl hover:bg-slate-100"
+                className="lg:hidden w-10 h-10 rounded-xl hover:bg-muted"
               />
             }>
-              <Menu className="w-5 h-5 text-slate-600" />
+              <Menu className="w-5 h-5 text-muted-foreground" />
             </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0 bg-sidebar border-r-0">
+            <SheetContent side="left" className="w-72 p-0 bg-sidebar border-sidebar-border">
               <SheetTitle className="sr-only">Nav</SheetTitle>
               <div className="p-8">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-maroon-600 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-900/40">
-                    <Building2 className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 bg-sidebar-primary rounded-xl flex items-center justify-center shadow-lg shadow-sidebar-primary/20">
+                    <Building2 className="w-5 h-5 text-sidebar-primary-foreground" />
                   </div>
-                  <span className="text-sm font-black text-white uppercase tracking-tight">SS Construction</span>
+                  <span className="text-sm font-black text-sidebar-foreground uppercase tracking-tight">SS Construction</span>
                 </div>
               </div>
               <nav className="px-4 space-y-1.5">
@@ -87,7 +87,7 @@ export default function AdminHeader() {
                       href={item.href}
                       className={cn(
                         "flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all",
-                        isActive ? "bg-maroon-600 text-white" : "text-slate-400 hover:text-white hover:bg-white/5"
+                        isActive ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20" : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
                       )}
                     >
                       <item.icon className="w-5 h-5" />
@@ -100,38 +100,38 @@ export default function AdminHeader() {
           </Sheet>
 
           <div className="flex flex-col">
-            <h1 className="text-sm font-black text-slate-400 uppercase tracking-[0.15em] leading-none mb-1 hidden sm:block">Overview</h1>
-            <p className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-none">{title}</p>
+            <h1 className="text-sm font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1 hidden sm:block">Overview</h1>
+            <p className="text-lg sm:text-xl font-black text-foreground tracking-tight leading-none">{title}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" className="hidden sm:flex w-10 h-10 rounded-xl border-slate-200 hover:bg-slate-50 relative group">
-            <Bell className="w-4.5 h-4.5 text-slate-400 group-hover:text-maroon-600 transition-colors" />
-            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-maroon-600 rounded-full border-2 border-white" />
+          <Button variant="outline" size="icon" className="hidden sm:flex w-10 h-10 rounded-xl border-border hover:bg-muted relative group">
+            <Bell className="w-4.5 h-4.5 text-muted-foreground group-hover:text-primary transition-colors" />
+            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-primary rounded-full border-2 border-background" />
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger render={
-              <button className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-2xl hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200 group" />
+              <button className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-2xl hover:bg-muted transition-all border border-transparent hover:border-border group" />
             }>
-                <Avatar className="w-9 h-9 border-2 border-white shadow-sm ring-1 ring-slate-200">
-                  <AvatarFallback className="bg-gradient-to-br from-slate-700 to-slate-900 text-white text-xs font-black">
+                <Avatar className="w-9 h-9 border-2 border-background shadow-sm ring-1 ring-border">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-black">
                     {user?.email?.charAt(0).toUpperCase() || "A"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start leading-none gap-0.5">
-                  <span className="text-[13px] font-black text-slate-900 tracking-tight">{user?.email?.split('@')[0] || "Admin"}</span>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Super Admin</span>
+                  <span className="text-[13px] font-black text-foreground tracking-tight">{user?.email?.split('@')[0] || "Admin"}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Super Admin</span>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-2xl border-slate-100">
+            <DropdownMenuContent align="end" className="w-56 rounded-lg p-2 shadow-xl border-border">
               <div className="px-3 py-2">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Signed in as</p>
-                <p className="text-sm font-bold text-slate-900 truncate">{user?.email}</p>
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Signed in as</p>
+                <p className="text-sm font-bold text-foreground truncate">{user?.email}</p>
               </div>
-              <DropdownMenuSeparator className="my-2" />
-              <DropdownMenuItem onClick={signOut} className="rounded-xl h-11 px-3 text-red-600 focus:text-white focus:bg-red-600 font-bold text-sm cursor-pointer">
+              <DropdownMenuSeparator className="my-2 bg-border" />
+              <DropdownMenuItem onClick={signOut} className="rounded-xl h-11 px-3 text-destructive focus:text-destructive-foreground focus:bg-destructive font-bold text-sm cursor-pointer">
                 <LogOut className="w-4.5 h-4.5 mr-2.5" />
                 Logout Session
               </DropdownMenuItem>

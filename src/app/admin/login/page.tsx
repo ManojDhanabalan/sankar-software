@@ -46,49 +46,51 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-maroon-900 via-maroon-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE4YzEuNjU2IDAgMyAxLjM0NCAzIDN2MjRjMCAxLjY1Ni0xLjM0NCAzLTMgM0gxMmMtMS42NTYgMC0zLTEuMzQ0LTMtM1YyMWMwLTEuNjU2IDEuMzQ0LTMgMy0zaDI0eiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
-
-      <Card className="relative w-full max-w-md border-0 shadow-2xl rounded-3xl bg-white/95 backdrop-blur-xl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 left-0 w-full h-full bg-primary/5 -skew-y-12 transform origin-top-left" />
+      <div className="absolute bottom-0 right-0 w-full h-full bg-primary/[0.02] skew-y-12 transform origin-bottom-right" />
+      
+      <Card className="relative w-full max-w-md border shadow-2xl rounded-3xl bg-card">
         <CardContent className="p-8">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-maroon-600 to-maroon-800 rounded-2xl flex items-center justify-center shadow-lg shadow-maroon-600/30 mb-4">
-              <Building2 className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 mb-4 transform -rotate-3 hover:rotate-0 transition-transform duration-500">
+              <Building2 className="w-8 h-8 text-primary-foreground" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              SS Construction
+            <h1 className="text-2xl font-bold text-foreground uppercase tracking-tight">
+              SS <span className="text-primary">Construction</span>
             </h1>
-            <p className="text-sm text-slate-500 mt-1">Admin Panel Login</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] mt-2">Admin Login</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@ssconstruction.com"
-                className="rounded-xl h-11"
+                placeholder="email@ssconstruction.com"
+                className="h-12 rounded-xl border-border bg-muted/20 font-medium px-4 focus-visible:ring-primary"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className="rounded-xl h-11 pr-10"
+                  placeholder="••••••••••••"
+                  className="h-12 rounded-xl border-border bg-muted/20 font-medium px-4 pr-12 focus-visible:ring-primary"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -101,20 +103,23 @@ export default function AdminLoginPage() {
             <Button
               type="submit"
               disabled={submitting}
-              className="w-full bg-gradient-to-r from-maroon-600 to-maroon-700 hover:from-maroon-700 hover:to-maroon-800 rounded-2xl h-12 text-base shadow-lg shadow-maroon-600/20"
+              className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase text-xs tracking-[0.2em] shadow-lg shadow-primary/20 transition-all active:scale-[0.98] mt-4"
             >
               {submitting ? (
-                "Signing in..."
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                  Logging in...
+                </div>
               ) : (
-                <>
-                  Sign In <LogIn className="ml-2 w-4 h-4" />
-                </>
+                <div className="flex items-center gap-2">
+                   Sign In <LogIn className="w-4 h-4" />
+                </div>
               )}
             </Button>
           </form>
 
-          <p className="text-xs text-slate-400 text-center mt-6">
-            Only authorized administrators can access the panel.
+          <p className="text-[10px] font-medium text-muted-foreground/60 text-center mt-8 uppercase tracking-widest italic">
+            SECURE ACCESS ONLY • AUTHORIZED PERSONNEL
           </p>
         </CardContent>
       </Card>

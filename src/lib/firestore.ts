@@ -120,15 +120,15 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   entries.forEach((entry) => {
     // Current date in IST or equivalent local if simple
     if (entry.date === today) {
-      todayTotalAmount += entry.totalAmount || 0;
-      entry.workers?.forEach(w => todayLabourCost += (w.amount || 0));
-      entry.materials?.forEach(m => todayMaterialCost += (m.amount || 0));
-      entry.expenses?.forEach(e => todayExpenseCost += (e.amount || 0));
+      todayTotalAmount += (Number(entry.totalAmount) || 0);
+      entry.workers?.forEach(w => todayLabourCost += (Number(w.amount) || 0));
+      entry.materials?.forEach(m => todayMaterialCost += (Number(m.amount) || 0));
+      entry.expenses?.forEach(e => todayExpenseCost += (Number(e.amount) || 0));
     }
     
     // Sum ALL pending amounts from all historical entries to show actual liability
     entry.workers?.forEach((worker) => {
-      totalPendingAmount += worker.pendingAmount || 0;
+      totalPendingAmount += (Number(worker.pendingAmount) || 0);
     });
   });
 

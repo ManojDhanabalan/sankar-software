@@ -40,15 +40,16 @@ export default function ContactPage() {
   return (
     <div className="pt-20 lg:pt-24">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-sm font-semibold text-blue-400 tracking-wider uppercase">
+      <section className="bg-primary py-20 lg:py-28 relative overflow-hidden border-b">
+        <div className="absolute inset-0 bg-primary-foreground/5 mix-blend-overlay" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <span className="text-sm font-bold text-primary-foreground/80 tracking-widest uppercase">
             Get In Touch
           </span>
-          <h1 className="mt-3 text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h1 className="mt-4 text-4xl lg:text-6xl font-bold text-primary-foreground tracking-tighter text-balance">
             Contact Us
           </h1>
-          <p className="mt-4 text-slate-300 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-primary-foreground/90 max-w-2xl mx-auto text-balance">
             Have a project in mind? Get in touch and let&apos;s discuss how we
             can bring your vision to life.
           </p>
@@ -56,14 +57,14 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form & Info */}
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-20 lg:py-28 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-5 gap-12">
             {/* Form */}
             <div className="lg:col-span-3">
-              <Card className="border-0 shadow-lg rounded-2xl">
-                <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold text-slate-900 mb-6">
+              <Card className="border border-border shadow-lg rounded-xl bg-card">
+                <CardContent className="p-8 lg:p-10">
+                  <h2 className="text-3xl font-bold text-foreground mb-8 tracking-tight">
                     Send us a Message
                   </h2>
                   <form onSubmit={handleSubmit} className="space-y-5">
@@ -121,13 +122,14 @@ export default function ContactPage() {
                     <Button
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl h-12"
+                      size="lg"
+                      className="w-full rounded-2xl h-14 text-base"
                     >
                       {loading ? (
                         "Sending..."
                       ) : (
                         <>
-                          Send Message <Send className="ml-2 w-4 h-4" />
+                          Send Message <Send className="ml-2 w-5 h-5" />
                         </>
                       )}
                     </Button>
@@ -138,31 +140,31 @@ export default function ContactPage() {
 
             {/* Info */}
             <div className="lg:col-span-2 space-y-6">
-              <Card className="border-0 shadow-sm rounded-2xl bg-blue-50">
+              <Card className="border border-border shadow-sm rounded-xl bg-card hover:shadow-md hover:border-primary/20 transition-all">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-                      <Phone className="w-5 h-5 text-blue-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Phone className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">Call Us</h3>
-                      <p className="text-sm text-slate-600">+91 98765 43210</p>
+                      <h3 className="font-bold text-foreground">Call Us</h3>
+                      <p className="text-sm text-muted-foreground mt-1">+91 98765 43210</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-sm rounded-2xl bg-green-50">
+              <Card className="border border-border shadow-sm rounded-xl bg-card hover:shadow-md hover:border-primary/20 transition-all">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
-                      <Mail className="w-5 h-5 text-green-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Mail className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">
+                      <h3 className="font-bold text-foreground">
                         Email Us
                       </h3>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground mt-1">
                         info@ssconstruction.com
                       </p>
                     </div>
@@ -170,17 +172,17 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-sm rounded-2xl bg-amber-50">
+              <Card className="border border-border shadow-sm rounded-xl bg-card hover:shadow-md hover:border-primary/20 transition-all">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                      <MapPin className="w-5 h-5 text-amber-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                      <MapPin className="w-6 h-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">
+                      <h3 className="font-bold text-foreground">
                         Visit Us
                       </h3>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground mt-1">
                         123 Construction Avenue,
                         <br /> Tamil Nadu, India
                       </p>
@@ -189,12 +191,12 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-sm rounded-2xl bg-slate-100">
+              <Card className="border border-border shadow-sm rounded-xl bg-muted/30">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-slate-900 mb-2">
+                  <h3 className="font-bold text-foreground mb-3 tracking-tight">
                     Working Hours
                   </h3>
-                  <div className="space-y-1 text-sm text-slate-600">
+                  <div className="space-y-2 text-sm text-muted-foreground font-medium">
                     <p>Monday – Saturday: 9:00 AM – 6:00 PM</p>
                     <p>Sunday: Closed</p>
                   </div>

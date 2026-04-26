@@ -37,15 +37,16 @@ export default function AboutPage() {
   return (
     <div className="pt-20 lg:pt-24">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 py-20 lg:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-sm font-semibold text-blue-400 tracking-wider uppercase">
+      <section className="bg-primary py-20 lg:py-28 relative overflow-hidden border-b">
+        <div className="absolute inset-0 bg-primary-foreground/5 mix-blend-overlay" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <span className="text-sm font-bold text-primary-foreground/80 tracking-widest uppercase">
             About SS Construction
           </span>
-          <h1 className="mt-3 text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          <h1 className="mt-4 text-4xl lg:text-6xl font-bold text-primary-foreground tracking-tighter text-balance">
             Our Story, Your Future
           </h1>
-          <p className="mt-4 text-slate-300 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-primary-foreground/90 max-w-2xl mx-auto text-balance">
             Over a decade of building excellence, trust, and lasting
             relationships with our valued clients.
           </p>
@@ -53,26 +54,26 @@ export default function AboutPage() {
       </section>
 
       {/* Company Details */}
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-20 lg:py-28 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             <div>
-              <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
                 Who We Are
               </h2>
-              <p className="mt-6 text-slate-600 leading-relaxed">
+              <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-balance">
                 SS Construction was founded with a simple mission: to build
                 structures that stand the test of time. Starting as a small team
                 of dedicated builders, we have grown into a full‑service
                 construction company serving clients across Tamil Nadu.
               </p>
-              <p className="mt-4 text-slate-600 leading-relaxed">
+              <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-balance">
                 Our expertise spans residential homes, commercial complexes,
                 industrial structures, and renovation projects. We take pride in
                 our attention to detail, adherence to safety standards, and
                 commitment to delivering projects on time and within budget.
               </p>
-              <p className="mt-4 text-slate-600 leading-relaxed">
+              <p className="mt-6 text-lg text-muted-foreground leading-relaxed text-balance">
                 With a workforce of over 500 skilled professionals including
                 masons, engineers, architects, and project managers, we have the
                 capacity to handle projects of any scale.
@@ -81,17 +82,17 @@ export default function AboutPage() {
 
             <div className="space-y-6">
               {/* Mission */}
-              <Card className="border-0 shadow-sm rounded-2xl bg-blue-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                      <Target className="w-5 h-5 text-blue-600" />
+              <Card className="border border-border shadow-sm rounded-xl bg-card hover:shadow-md transition-all">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Target className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">
                       Our Mission
                     </h3>
                   </div>
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     To deliver exceptional construction services that exceed
                     client expectations while maintaining the highest standards
                     of safety, quality, and environmental responsibility.
@@ -100,17 +101,17 @@ export default function AboutPage() {
               </Card>
 
               {/* Vision */}
-              <Card className="border-0 shadow-sm rounded-2xl bg-amber-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                      <Eye className="w-5 h-5 text-amber-600" />
+              <Card className="border border-border shadow-sm rounded-xl bg-card hover:shadow-md transition-all">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center">
+                      <Eye className="w-6 h-6 text-secondary-foreground" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">
                       Our Vision
                     </h3>
                   </div>
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     To be the most trusted and innovative construction company
                     in South India, setting new benchmarks for quality and
                     customer satisfaction in the industry.
@@ -119,17 +120,17 @@ export default function AboutPage() {
               </Card>
 
               {/* Experience */}
-              <Card className="border-0 shadow-sm rounded-2xl bg-green-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                      <Award className="w-5 h-5 text-green-600" />
+              <Card className="border border-border shadow-sm rounded-xl bg-card hover:shadow-md transition-all">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center border border-border">
+                      <Award className="w-6 h-6 text-foreground" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">
                       Our Experience
                     </h3>
                   </div>
-                  <p className="text-sm text-slate-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     With 12+ years of experience and 150+ successful projects,
                     we bring deep industry knowledge and proven expertise to
                     every construction project we undertake.
@@ -142,13 +143,13 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-20 lg:py-28 bg-slate-50">
+      <section className="py-20 lg:py-28 bg-muted/30 border-t">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-sm font-semibold text-blue-600 tracking-wider uppercase">
+            <span className="text-sm font-bold text-primary tracking-widest uppercase">
               Our Values
             </span>
-            <h2 className="mt-3 text-3xl font-bold text-slate-900 tracking-tight">
+            <h2 className="mt-4 text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
               What Drives Us
             </h2>
           </div>
@@ -156,16 +157,16 @@ export default function AboutPage() {
             {values.map((v) => (
               <Card
                 key={v.title}
-                className="border-0 shadow-sm rounded-2xl bg-white text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                className="border border-border shadow-sm rounded-2xl bg-card text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-primary/20"
               >
-                <CardContent className="p-6">
-                  <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <v.icon className="w-7 h-7 text-blue-600" />
+                <CardContent className="p-8">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <v.icon className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  <h3 className="text-xl font-bold text-foreground mb-3 tracking-tight">
                     {v.title}
                   </h3>
-                  <p className="text-sm text-slate-600">{v.desc}</p>
+                  <p className="text-muted-foreground leading-relaxed">{v.desc}</p>
                 </CardContent>
               </Card>
             ))}

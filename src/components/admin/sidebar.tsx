@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 const menuItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/site-setup", label: "Site Setup", icon: Building2 },
-  { href: "/admin/daily-entry", label: "Daily Entry", icon: CalendarDays },
   { href: "/admin/reports", label: "View Records", icon: FileBarChart },
 ];
 
@@ -56,7 +55,7 @@ export default function AdminSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto mt-4">
-          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-3 mb-4">
+          <div className="text-[10px] font-black text-sidebar-foreground/50 uppercase tracking-[0.2em] px-3 mb-4">
             Main Management
           </div>
           {menuItems.map((item) => {
@@ -71,19 +70,19 @@ export default function AdminSidebar() {
                 className={cn(
                   "group flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[13px] font-bold transition-all duration-300 relative overflow-hidden",
                   isActive
-                    ? "bg-maroon-600 text-white shadow-lg shadow-maroon-600/20"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20"
+                    : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
                 )}
               >
                 <item.icon
                   className={cn(
                     "w-5 h-5 transition-transform group-hover:scale-110",
-                    isActive ? "text-white" : "text-slate-500"
+                    isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/50"
                   )}
                 />
                 {item.label}
                 {isActive && (
-                  <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-white/20" />
+                  <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-sidebar-primary-foreground/20" />
                 )}
               </Link>
             );
@@ -92,13 +91,13 @@ export default function AdminSidebar() {
 
         {/* Sidebar Footer */}
         <div className="p-6 mt-auto">
-          <div className="bg-slate-800/50 rounded-2xl p-4 border border-white/5">
+          <div className="bg-sidebar-accent/50 rounded-2xl p-4 border border-sidebar-border">
              <Link
               href="/"
-              className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-wider"
+              className="flex items-center gap-2 text-xs font-bold text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors uppercase tracking-wider"
             >
-              <div className="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center">
-                <X className="w-3 h-3" />
+              <div className="w-6 h-6 rounded-lg bg-sidebar-accent flex items-center justify-center">
+                <X className="w-3 h-3 text-sidebar-foreground/80" />
               </div>
               Exit Admin
             </Link>

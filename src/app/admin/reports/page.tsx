@@ -1,456 +1,661 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getDailyEntries, getSites } from "@/lib/firestore";
+import { useSearchParams } from "next/navigation";
+import { getDailyEntries, getSites, deleteDailyEntry } from "@/lib/firestore";
 import type { DailyEntry, Site } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search, Calendar, FileText, Users, Building2, ChevronRight, X, DollarSign, PackageSearch, IndianRupee } from "lucide-react";
+import { 
+  Loader2, Search, Calendar, Users, Building2, ChevronRight, X, 
+  DollarSign, Package, IndianRupee, Plus, Cog, CheckCircle2, 
+  AlertCircle, Clock, Trash2, MoreVertical, Pencil
+} from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import Link from "next/link";
-import { format, parseISO } from "date-fns";
-import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { format, parseISO, isValid } from "date-fns";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ReportsPage() {
-  const router = useRouter();
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Tabs
-  const [activeTab, setActiveTab] = useState<"entries" | "workers" | "sites">("entries");
+  const searchParams = useSearchParams();
 
-  // Filters for Entries
+  // Tabs — read initial tab from URL query param (e.g. ?tab=workers)
+  const [activeTab, setActiveTab] = useState<"entries" | "workers" | "sites">(() => {
+    const t = searchParams.get("tab");
+    if (t === "workers" || t === "sites") return t;
+    return "entries";
+  });
+
+  // Filters
   const [filterSite, setFilterSite] = useState<string>("all");
   const [filterMonth, setFilterMonth] = useState<string>("all");
   const [filterYear, setFilterYear] = useState<string>(new Date().getFullYear().toString());
   const [searchName, setSearchName] = useState<string>("");
   const [searchWorker, setSearchWorker] = useState<string>("");
+  const [searchSite, setSearchSite] = useState<string>("");
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
   // Dialog State
-  const [modalType, setModalType] = useState<"workers" | "materials" | "expenses" | null>(null);
+  const [modalType, setModalType] = useState<"workers" | "materials" | "machinery" | "expenses" | "full" | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<DailyEntry | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [eData, sData] = await Promise.all([getDailyEntries(), getSites()]);
-        setEntries(eData);
-        setSites(sData);
-      } catch (error) {
-        console.error("Error loading records", error);
-      }
-      setLoading(false);
-    }
     loadData();
   }, []);
 
-  // Compute unique years
-  const availableYears = Array.from(new Set(entries.map(e => e.date.split("-")[0]))).sort().reverse();
-  if (!availableYears.includes(new Date().getFullYear().toString())) {
-    availableYears.push(new Date().getFullYear().toString());
+  async function loadData() {
+    setLoading(true);
+    try {
+      const [eData, sData] = await Promise.all([getDailyEntries(), getSites()]);
+      setEntries(eData || []);
+      setSites(sData || []);
+    } catch (error) {
+      console.error("Error loading records", error);
+    }
+    setLoading(false);
   }
 
-  // Derived Data: Workers filtered by search
-  const workersMap = new Map<string, { name: string, earned: number, paid: number, pending: number }>();
-  entries.forEach(entry => {
-    entry.workers?.forEach(w => {
-      if (!w.personName) return;
-      const key = w.personName.trim().toLowerCase();
-      if (!workersMap.has(key)) workersMap.set(key, { name: w.personName.trim(), earned: 0, paid: 0, pending: 0 });
-      const current = workersMap.get(key)!;
-      current.earned += (w.amount || 0);
-      current.paid += (w.paidAmount || 0);
-      current.pending += (w.pendingAmount || 0);
-    });
-  });
-  const workersList = Array.from(workersMap.values())
-    .filter(w => w.name.toLowerCase().includes(searchWorker.toLowerCase()))
-    .sort((a,b) => a.name.localeCompare(b.name));
+  const handleDeleteEntry = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await deleteDailyEntry(deleteConfirmId);
+      toast.success("ENTRY REMOVED FROM RECORDS");
+      setDeleteConfirmId(null);
+      loadData();
+    } catch (error) {
+      console.error(error);
+      toast.error("FAILED TO DELETE ENTRY");
+    }
+  };
+
+  const safeDateSplit = (dateStr: string) => {
+    if (!dateStr || typeof dateStr !== 'string') return [null, null, null];
+    return dateStr.split("-");
+  };
+
+  const availableYears = Array.from(new Set(entries.map(e => safeDateSplit(e.date)[0]).filter(Boolean))).sort().reverse() as string[];
+  if (availableYears.length === 0) availableYears.push(new Date().getFullYear().toString());
 
   // Filtered Entries
   const filteredEntries = entries.filter(e => {
     if (filterSite !== "all" && e.siteId !== filterSite) return false;
-    const [y, m] = e.date.split("-");
+    const [y, m] = safeDateSplit(e.date);
     if (filterYear !== "all" && y !== filterYear) return false;
     if (filterMonth !== "all" && m !== filterMonth) return false;
-
     if (searchName.trim() !== "") {
       const q = searchName.toLowerCase().trim();
-      const hasWorker = e.workers?.some(w => w.personName.toLowerCase().includes(q));
-      if (!hasWorker) return false;
+      return e.workers?.some(w => w.personName.toLowerCase().includes(q));
     }
     return true;
   });
 
-  const paginatedEntries = filteredEntries.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const totalPages = Math.ceil(filteredEntries.length / pageSize);
+  const workersMap = new Map<string, { name: string, earned: number, paid: number, pending: number, roles: Set<string> }>();
+  entries.forEach(entry => {
+    entry.workers?.forEach(w => {
+      if (!w.personName) return;
+      const key = w.personName.trim().toLowerCase();
+      if (!workersMap.has(key)) workersMap.set(key, { name: w.personName.trim(), earned: 0, paid: 0, pending: 0, roles: new Set() });
+      const current = workersMap.get(key)!;
+      current.earned += (Number(w.amount) || 0);
+      current.paid += (Number(w.paidAmount) || 0);
+      current.pending += (Number(w.pendingAmount) || 0);
+      if (w.type && w.type !== '—') current.roles.add(w.type);
+    });
+  });
+  const workersList = Array.from(workersMap.values())
+    .map(w => ({ ...w, rolesList: Array.from(w.roles) }))
+    .filter(w => w.name.toLowerCase().includes(searchWorker.toLowerCase()))
+    .sort((a,b) => a.name.localeCompare(b.name));
 
-  const openModal = (entry: DailyEntry, type: "workers" | "materials" | "expenses") => {
+  const filteredSites = sites.filter(s => 
+    s.siteName.toLowerCase().includes(searchSite.toLowerCase())
+  );
+
+  const totalEntriesPages = Math.ceil(filteredEntries.length / pageSize);
+  const totalWorkersPages = Math.ceil(workersList.length / pageSize);
+  
+  const paginatedEntries = filteredEntries.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedWorkers = workersList.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedSites = filteredSites.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const openModal = (entry: DailyEntry, type: "workers" | "materials" | "machinery" | "expenses" | "full") => {
     setSelectedEntry(entry);
     setModalType(type);
   };
 
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-slate-50"><Loader2 className="w-12 h-12 animate-spin text-maroon-600" /></div>;
-  }
+  const safeFormatDate = (dateStr: string) => {
+    if (!dateStr) return "N/A";
+    const d = parseISO(dateStr);
+    return isValid(d) ? format(d, "dd MMM, yyyy").toUpperCase() : "N/A";
+  };
+
+  if (loading) return <div className="flex h-screen items-center justify-center bg-background"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
 
   return (
-    <div className="space-y-10 max-w-7xl mx-auto pb-12 animate-in fade-in duration-700">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 border-b border-slate-200 pb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tightest uppercase">
-            Data <span className="text-maroon-600">Analytics</span>
-          </h1>
-          <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">
-            Infrastructure logs & financial history
-          </p>
-        </div>
+    <div className="max-w-7xl mx-auto py-2 px-1 sm:px-4 space-y-4 animate-in fade-in duration-500">
+
+      {/* Primary Action Mobile */}
+      <div className="lg:hidden flex justify-end px-1 pt-2">
+        <Link href="/admin/daily-entry" className="w-full sm:w-auto">
+          <Button size="sm" className="w-full h-11 rounded-sm bg-primary text-[11px] font-black uppercase tracking-[0.15em] hover:opacity-90 shadow-lg shadow-primary/20 gap-2">
+            <Plus className="w-4 h-4" /> GIVE ENTRY
+          </Button>
+        </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-[2rem] w-fit">
-        <button 
-          className={cn("px-8 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300", 
-            activeTab === "entries" ? "bg-slate-900 text-white shadow-xl shadow-slate-200" : "text-slate-500 hover:text-slate-900 hover:bg-white")} 
-          onClick={() => setActiveTab("entries")}
-        >
-          Daily Logs
-        </button>
-        <button 
-          className={cn("px-8 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300", 
-            activeTab === "workers" ? "bg-slate-900 text-white shadow-xl shadow-slate-200" : "text-slate-500 hover:text-slate-900 hover:bg-white")} 
-          onClick={() => setActiveTab("workers")}
-        >
-          Worker Directory
-        </button>
-        <button 
-          className={cn("px-8 py-3 text-[10px] font-black uppercase tracking-widest rounded-full transition-all duration-300", 
-            activeTab === "sites" ? "bg-slate-900 text-white shadow-xl shadow-slate-200" : "text-slate-500 hover:text-slate-900 hover:bg-white")} 
-          onClick={() => setActiveTab("sites")}
-        >
-          Site Archives
-        </button>
+      {/* Tabs */}
+      <div className="border-b border-border/40 pb-0 flex items-center h-12 overflow-x-auto">
+        <div className="flex items-center gap-6 sm:gap-8 px-4 sm:px-1 h-full min-w-max">
+          {["entries", "workers", "sites"].map((tab) => (
+            <button 
+              key={tab}
+              className={cn("h-full flex items-center text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all relative border-b-2", 
+                activeTab === tab ? "text-primary border-primary" : "text-muted-foreground/60 hover:text-blue-950 border-transparent")}
+              onClick={() => { setActiveTab(tab as any); setCurrentPage(1); }}
+            >
+              {tab === "entries" ? "RECORDS" : tab.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <Link href="/admin/daily-entry" className="hidden lg:block ml-auto">
+          <Button size="sm" className="mb-2 h-9 rounded-sm bg-primary text-[10px] font-black uppercase tracking-widest hover:opacity-90 shadow-sm gap-2 px-6 shadow-primary/10">
+            <Plus className="w-4 h-4" /> GIVE ENTRY
+          </Button>
+        </Link>
       </div>
 
       {activeTab === "entries" && (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <Card className="border-0 shadow-2xl rounded-[2.5rem] bg-white overflow-hidden">
-            <CardContent className="p-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              <div className="space-y-2.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Project Site</label>
-                <Select value={filterSite} onValueChange={(v) => { setFilterSite(v || "all"); setCurrentPage(1); }}>
-                  <SelectTrigger className="h-12 rounded-2xl border-slate-50 bg-slate-50/50 font-black uppercase text-[10px] tracking-widest">
-                    <SelectValue placeholder="All Sites" />
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-1 duration-400">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 items-center">
+            <div className="relative lg:col-span-2">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
+              <Input 
+                placeholder="SEARCH WORKER NAME..." 
+                className="h-10 pl-9 rounded-sm border-border bg-card shadow-sm text-xs font-black text-blue-950 uppercase"
+                value={searchName}
+                onChange={e => { setSearchName(e.target.value); setCurrentPage(1); }}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-2 lg:col-span-2">
+               <Select value={filterSite} onValueChange={v => { setFilterSite(v || "all"); setCurrentPage(1); }}>
+                <SelectTrigger className="h-10 rounded-sm border-border bg-card shadow-sm text-[10px] font-black uppercase text-blue-950">
+                  <SelectValue placeholder="ALL SITES" />
+                </SelectTrigger>
+                <SelectContent className="rounded-sm">
+                  <SelectItem value="all">ALL SITES</SelectItem>
+                  {sites.map(s => <SelectItem key={s.id} value={s.id} className="uppercase font-black text-[10px]">{s.siteName}</SelectItem>)}
+                </SelectContent>
+              </Select>
+
+              <div className="flex gap-1.5">
+                <Select value={filterYear} onValueChange={v => { setFilterYear(v || "all"); setCurrentPage(1); }}>
+                  <SelectTrigger className="h-10 rounded-sm border-border bg-card shadow-sm text-[10px] font-black uppercase flex-1 text-blue-950">
+                    <SelectValue placeholder="YEAR" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-100">
-                    <SelectItem value="all" className="font-black text-[10px] uppercase py-3">Any Location</SelectItem>
-                    {sites.map(s => <SelectItem key={s.id} value={s.id} className="font-black text-[10px] uppercase py-3">{s.siteName}</SelectItem>)}
+                  <SelectContent className="rounded-sm">
+                    <SelectItem value="all">YR</SelectItem>
+                    {availableYears.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filterMonth} onValueChange={v => { setFilterMonth(v || "all"); setCurrentPage(1); }}>
+                  <SelectTrigger className="h-10 rounded-sm border-border bg-card shadow-sm text-[10px] font-black uppercase flex-1 text-blue-950">
+                    <SelectValue placeholder="MONTH" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-sm">
+                    <SelectItem value="all">MO</SelectItem>
+                    {["01","02","03","04","05","06","07","08","09","10","11","12"].map(m => <SelectItem key={m} value={m} className="uppercase font-black">{format(new Date(2000, parseInt(m)-1), "MMM")}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          </div>
 
-              <div className="space-y-2.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Calendar Year</label>
-                <Select value={filterYear} onValueChange={(v) => { setFilterYear(v || "all"); setCurrentPage(1); }}>
-                  <SelectTrigger className="h-12 rounded-2xl border-slate-50 bg-slate-50/50 font-black text-[10px]">
-                    <SelectValue placeholder="Year" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-100">
-                    <SelectItem value="all" className="font-black text-[10px] py-3">Any Year</SelectItem>
-                    {availableYears.map(y => <SelectItem key={y} value={y} className="font-black text-[10px] py-3">{y}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+          <Card className="border border-border/40 shadow-sm rounded-sm overflow-hidden bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/10 border-b border-border/60 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    <th className="px-5 py-4 text-center whitespace-nowrap">DATE</th>
+                    <th className="px-5 py-4 text-center">SITE NAME</th>
+                    <th className="px-5 py-4 text-center">SUMMARY</th>
+                    <th className="px-5 py-4 text-center">TOTAL AMT</th>
+                    <th className="px-5 py-4 text-center">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/20">
+                  {paginatedEntries.map(e => (
+                    <tr key={e.id} className="hover:bg-muted/5 transition-colors group cursor-pointer" onClick={() => openModal(e, "full")}>
+                      <td className="px-5 py-4 text-xs font-black text-blue-950 tracking-tight text-center whitespace-nowrap">
+                        {safeFormatDate(e.date)}
+                      </td>
+                      <td className="px-5 py-4 text-xs font-black text-blue-950/80 tracking-tight uppercase text-center">
+                        {sites.find(s => s.id === e.siteId)?.siteName || "N/A"}
+                      </td>
+                      <td className="px-5 py-4 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          {(() => {
+                            const l = (e.workers || []).reduce((s, w) => s + (Number(w.amount) || 0), 0);
+                            const m = (e.materials || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                            const eq = (e.machinery || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                            const ex = (e.expenses || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                            const gt = l + m + eq + ex;
 
-              <div className="space-y-2.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Fiscal Month</label>
-                <Select value={filterMonth} onValueChange={(v) => { setFilterMonth(v || "all"); setCurrentPage(1); }}>
-                  <SelectTrigger className="h-12 rounded-2xl border-slate-50 bg-slate-50/50 font-black uppercase text-[10px] tracking-widest">
-                    <SelectValue placeholder="Month" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-100">
-                    <SelectItem value="all" className="font-black text-[10px] uppercase py-3">Any Month</SelectItem>
-                    {Array.from({length: 12}).map((_, i) => (
-                      <SelectItem key={i+1} value={(i+1).toString().padStart(2, "0")} className="font-black text-[10px] uppercase py-3">
-                        {format(new Date(2000, i, 1), "MMMM")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2.5">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Resource Search</label>
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <Input placeholder="WORKER NAME..." className="h-12 pl-11 rounded-2xl border-slate-50 bg-slate-50/50 font-black uppercase text-[10px] tracking-widest" value={searchName} onChange={(e) => { setSearchName(e.target.value); setCurrentPage(1); }} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-2xl rounded-[2.5rem] bg-white overflow-hidden">
-             <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-slate-900 border-b border-white/5 text-[9px] uppercase text-slate-400 font-extrabold tracking-[0.2em]">
-                    <tr>
-                      <th className="px-8 py-6">Timestamp</th>
-                      <th className="px-8 py-6">Project Archive</th>
-                      <th className="px-8 py-6 text-center">Labour</th>
-                      <th className="px-8 py-6 text-center">Material</th>
-                      <th className="px-8 py-6 text-center">Expense</th>
-                      <th className="px-8 py-6 text-right">Settlement</th>
+                            return (
+                              <>
+                                <div className="flex flex-col items-center gap-0.5 min-w-[45px]">
+                                  <span className="text-[8px] font-bold text-muted-foreground uppercase">LABOUR</span>
+                                  <span className="text-[10px] font-black text-indigo-700">₹{l.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div className="h-6 w-px bg-border/40 mx-1" />
+                                <div className="flex flex-col items-center gap-0.5 min-w-[45px]">
+                                  <span className="text-[8px] font-bold text-muted-foreground uppercase">MAT</span>
+                                  <span className="text-[10px] font-black text-emerald-700">₹{m.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div className="h-6 w-px bg-border/40 mx-1" />
+                                <div className="flex flex-col items-center gap-0.5 min-w-[45px]">
+                                  <span className="text-[8px] font-bold text-muted-foreground uppercase">EQUIP</span>
+                                  <span className="text-[10px] font-black text-amber-700">₹{eq.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div className="h-6 w-px bg-border/40 mx-1" />
+                                <div className="flex flex-col items-center gap-0.5 min-w-[45px]">
+                                  <span className="text-[8px] font-bold text-muted-foreground uppercase">EXP</span>
+                                  <span className="text-[10px] font-black text-rose-700">₹{ex.toLocaleString('en-IN')}</span>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-center font-black text-xs tracking-tight text-blue-950">
+                        {(() => {
+                           const l = (e.workers || []).reduce((s, w) => s + (Number(w.amount) || 0), 0);
+                           const m = (e.materials || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                           const eq = (e.machinery || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                           const ex = (e.expenses || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                           return `₹${(l + m + eq + ex).toLocaleString('en-IN')}`;
+                        })()}
+                      </td>
+                      <td className="px-5 py-4 text-center" onClick={(ev) => ev.stopPropagation()}>
+                         <div className="flex justify-center">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="h-6 w-6 rounded-sm text-blue-950/30 hover:text-destructive hover:bg-destructive/5 flex items-center justify-center outline-none cursor-pointer">
+                                <MoreVertical className="w-3 h-3" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="rounded-[sm] border-border p-1">
+                               <DropdownMenuItem className="p-0 rounded-sm cursor-pointer">
+                                 <Link href={`/admin/daily-entry?edit=${e.id}`} className="text-[10px] font-black uppercase tracking-widest py-2 px-3 flex items-center gap-2 w-full">
+                                   <Pencil className="w-3.5 h-3.5" /> EDIT RECORD
+                                 </Link>
+                               </DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => setDeleteConfirmId(e.id)} className="text-[10px] font-black uppercase tracking-widest py-2 px-3 rounded-sm cursor-pointer hover:bg-destructive/5 focus:bg-destructive/5 text-destructive flex items-center gap-2">
+                                  <Trash2 className="w-3.5 h-3.5" /> DELETE RECORD
+                               </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                         </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {paginatedEntries.map(entry => {
-                      const sName = sites.find(s => s.id === entry.siteId)?.siteName || "Unknown";
-                      return (
-                        <tr key={entry.id} className="hover:bg-slate-50/50 transition-all duration-300 group">
-                          <td className="px-8 py-6">
-                            <div className="font-black text-slate-900 uppercase tracking-tightest">{format(parseISO(entry.date), "dd MMM yyyy")}</div>
-                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">{entry.time}</div>
-                          </td>
-                          <td className="px-8 py-6 font-black text-maroon-600 uppercase tracking-tightest group-hover:translate-x-1 transition-transform">{sName}</td>
-                          <td className="px-8 py-6 text-center">
-                            <Button size="sm" variant="outline" className="h-9 px-5 text-[9px] font-black uppercase tracking-widest rounded-2xl bg-maroon-50/50 border-maroon-100 text-maroon-800 hover:bg-maroon-800 hover:text-white hover:shadow-lg hover:shadow-maroon-200 transition-all active:scale-95" onClick={() => openModal(entry, "workers")}>
-                              {entry.workers?.length || 0} Records
-                            </Button>
-                          </td>
-                          <td className="px-8 py-6 text-center">
-                            <Button size="sm" variant="outline" className="h-9 px-5 text-[9px] font-black uppercase tracking-widest rounded-2xl bg-emerald-50/50 border-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white hover:shadow-lg hover:shadow-emerald-200 transition-all active:scale-95" onClick={() => openModal(entry, "materials")}>
-                              {entry.materials?.length || 0} Items
-                            </Button>
-                          </td>
-                          <td className="px-8 py-6 text-center">
-                            <Button size="sm" variant="outline" className="h-9 px-5 text-[9px] font-black uppercase tracking-widest rounded-2xl bg-amber-50/50 border-amber-100 text-amber-700 hover:bg-amber-600 hover:text-white hover:shadow-lg hover:shadow-amber-200 transition-all active:scale-95" onClick={() => openModal(entry, "expenses")}>
-                              {entry.expenses?.length || 0} Logs
-                            </Button>
-                          </td>
-                          <td className="px-8 py-6 text-right font-black text-slate-900 text-lg tracking-tightest">₹{entry.totalAmount?.toLocaleString('en-IN')}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-             </div>
-             {filteredEntries.length === 0 && (
-               <div className="p-32 text-center text-slate-300 font-black uppercase tracking-[0.2em] italic">Database empty for criteria.</div>
-             )}
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </Card>
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-6 pt-4">
-              <Button variant="ghost" className="h-12 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest border border-slate-100" disabled={currentPage === 1} onClick={() => setCurrentPage(v => v - 1)}>Prev Archive</Button>
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Node {currentPage} / {totalPages}</div>
-              <Button variant="ghost" className="h-12 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest border border-slate-100" disabled={currentPage === totalPages} onClick={() => setCurrentPage(v => v + 1)}>Next Archive</Button>
+          {totalEntriesPages > 1 && (
+            <div className="flex justify-center items-center gap-4 py-4">
+              <Button variant="outline" size="sm" className="h-8 rounded-sm text-[10px] font-black uppercase text-blue-950" disabled={currentPage === 1} onClick={() => setCurrentPage(v => v - 1)}>PREV</Button>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">PAGE {currentPage} OF {totalEntriesPages}</span>
+              <Button variant="outline" size="sm" className="h-8 rounded-sm text-[10px] font-black uppercase text-blue-950" disabled={currentPage === totalEntriesPages} onClick={() => setCurrentPage(v => v + 1)}>NEXT</Button>
             </div>
           )}
         </div>
       )}
 
+      {/* WORKERS TAB */}
       {activeTab === "workers" && (
-        <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 space-y-8">
-           <Card className="border-0 shadow-2xl bg-white p-8 rounded-[2.5rem]">
-             <div className="relative max-w-md">
-                <Search className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" />
-                <Input placeholder="SEARCH OPERATIVE NAME..." className="pl-14 bg-slate-50/50 border-slate-50 font-black h-14 rounded-2xl uppercase text-xs tracking-widest" value={searchWorker} onChange={e => setSearchWorker(e.target.value)} />
-             </div>
-           </Card>
-           
-           <Card className="border-0 shadow-2xl rounded-[2.5rem] bg-white overflow-hidden">
-             <div className="p-0 overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-slate-900 border-b border-white/5 text-[9px] uppercase text-slate-400 font-extrabold tracking-[0.2em]">
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-1 duration-400">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
+            <Input
+              placeholder="SEARCH WORKER NAME..."
+              className="h-10 pl-9 rounded-sm border-border bg-card shadow-sm text-xs font-black text-blue-950 uppercase"
+              value={searchWorker}
+              onChange={e => { setSearchWorker(e.target.value); setCurrentPage(1); }}
+            />
+          </div>
+
+          <Card className="border border-border/40 shadow-sm rounded-sm overflow-hidden bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/10 border-b border-border/60 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    <th className="px-5 py-4">#</th>
+                    <th className="px-5 py-4">WORKER NAME</th>
+                    <th className="px-5 py-4">ROLES</th>
+                    <th className="px-5 py-4 text-right">TOTAL EARNED</th>
+                    <th className="px-5 py-4 text-right">PAID</th>
+                    <th className="px-5 py-4 text-right">PENDING</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/20">
+                  {paginatedWorkers.length === 0 ? (
                     <tr>
-                      <th className="px-8 py-6">Resource Name</th>
-                      <th className="px-8 py-6 text-right">Gross Earned</th>
-                      <th className="px-8 py-6 text-right">Settled</th>
-                      <th className="px-8 py-6 text-right">Exposure</th>
+                      <td colSpan={6} className="px-5 py-10 text-center text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        No workers found
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50 bg-white">
-                    {workersList.map((worker) => (
-                      <tr key={worker.name} className="hover:bg-maroon-50/30 transition-all duration-300 cursor-pointer group" onClick={() => router.push(`/admin/reports/worker/${encodeURIComponent(worker.name)}`)}>
-                        <td className="px-8 py-6 font-black text-slate-900 flex items-center gap-4 group-hover:text-maroon-600 uppercase tracking-tightest">
-                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-maroon-600 group-hover:text-white transition-all">
-                             <Users className="w-5 h-5" />
-                          </div>
-                          {worker.name}
+                  ) : paginatedWorkers.map((w, i) => (
+                    <tr key={w.name} className="hover:bg-muted/5 transition-colors">
+                      <td className="px-5 py-4 text-xs font-black text-muted-foreground/60">
+                        {(currentPage - 1) * pageSize + i + 1}
+                      </td>
+                      <td className="px-5 py-4">
+                        <Link
+                          href={`/admin/workers/${encodeURIComponent(w.name)}`}
+                          className="text-xs font-black text-primary uppercase tracking-tight underline underline-offset-2 flex items-center gap-1 hover:opacity-70 transition-opacity"
+                        >
+                          {w.name} <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />
+                        </Link>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {w.rolesList.map(r => (
+                            <span key={r} className="text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full uppercase">
+                              {r}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-5 py-4 text-xs font-black text-blue-950 text-right">
+                        ₹{w.earned.toLocaleString('en-IN')}
+                      </td>
+                      <td className="px-5 py-4 text-xs font-black text-emerald-700 text-right">
+                        ₹{w.paid.toLocaleString('en-IN')}
+                      </td>
+                      <td className="px-5 py-4 text-xs font-black text-rose-600 text-right">
+                        ₹{w.pending.toLocaleString('en-IN')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {totalWorkersPages > 1 && (
+            <div className="flex justify-center items-center gap-4 py-4">
+              <Button variant="outline" size="sm" className="h-8 rounded-sm text-[10px] font-black uppercase text-blue-950" disabled={currentPage === 1} onClick={() => setCurrentPage(v => v - 1)}>PREV</Button>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">PAGE {currentPage} OF {totalWorkersPages}</span>
+              <Button variant="outline" size="sm" className="h-8 rounded-sm text-[10px] font-black uppercase text-blue-950" disabled={currentPage === totalWorkersPages} onClick={() => setCurrentPage(v => v + 1)}>NEXT</Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SITES TAB */}
+      {activeTab === "sites" && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-1 duration-400">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
+            <Input
+              placeholder="SEARCH SITE NAME..."
+              className="h-10 pl-9 rounded-sm border-border bg-card shadow-sm text-xs font-black text-blue-950 uppercase"
+              value={searchSite}
+              onChange={e => { setSearchSite(e.target.value); setCurrentPage(1); }}
+            />
+          </div>
+
+          <Card className="border border-border/40 shadow-sm rounded-sm overflow-hidden bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-muted/10 border-b border-border/60 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    <th className="px-5 py-4">#</th>
+                    <th className="px-5 py-4">SITE NAME</th>
+                    <th className="px-5 py-4 text-right">LABOUR</th>
+                    <th className="px-5 py-4 text-right">MATERIAL</th>
+                    <th className="px-5 py-4 text-right">MACHINERY</th>
+                    <th className="px-5 py-4 text-right">EXPENSES</th>
+                    <th className="px-5 py-4 text-right">GRAND TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/20">
+                  {paginatedSites.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-5 py-10 text-center text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        No sites found
+                      </td>
+                    </tr>
+                  ) : paginatedSites.map((s, i) => {
+                    const siteEntries = entries.filter(e => e.siteId === s.id);
+                    const labour    = siteEntries.flatMap(e => e.workers   || []).reduce((t, w) => t + (Number(w.amount) || 0), 0);
+                    const lCount    = siteEntries.flatMap(e => e.workers   || []).reduce((t, w) => t + (Number(w.labourCount) || (w.type === 'RW' ? 1 : 0)), 0);
+                    const material  = siteEntries.flatMap(e => e.materials || []).reduce((t, m) => t + (Number(m.amount) || 0), 0);
+                    const machinery = siteEntries.flatMap(e => e.machinery || []).reduce((t, m) => t + (Number(m.amount) || 0), 0);
+                    const expenses  = siteEntries.flatMap(e => e.expenses  || []).reduce((t, x) => t + (Number(x.amount) || 0), 0);
+                    const grand     = labour + material + machinery + expenses;
+                    return (
+                      <tr key={s.id} className="hover:bg-muted/5 transition-colors">
+                        <td className="px-5 py-4 text-xs font-black text-muted-foreground/60">
+                          {(currentPage - 1) * pageSize + i + 1}
                         </td>
-                        <td className="px-8 py-6 text-right text-slate-500 font-black tracking-tightest">₹{worker.earned.toLocaleString('en-IN')}</td>
-                        <td className="px-8 py-6 text-right text-emerald-600 font-black tracking-tightest">₹{worker.paid.toLocaleString('en-IN')}</td>
-                        <td className="px-8 py-6 text-right">
-                           <span className={cn("px-4 py-1.5 rounded-full font-black text-xs tracking-tightest shadow-sm", 
-                             worker.pending > 0 ? 'bg-red-50 text-red-600 ring-1 ring-red-100' : 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100')}>
-                             ₹{worker.pending.toLocaleString('en-IN')}
-                           </span>
+                        <td className="px-5 py-4">
+                          <Link
+                            href={`/admin/sites/${s.id}`}
+                            className="text-xs font-black text-primary uppercase tracking-tight underline underline-offset-2 flex items-center gap-1 hover:opacity-70 transition-opacity"
+                          >
+                            {s.siteName} <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />
+                          </Link>
+                          <div className="flex flex-col mt-0.5">
+                            {s.location && <span className="text-[10px] text-muted-foreground/50">{s.location}</span>}
+                            {lCount > 0 && (
+                              <span className="text-[9px] font-black text-indigo-600 bg-indigo-50/50 px-1 w-fit rounded mt-0.5">
+                                {lCount} TOTAL LABOUR
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-right text-xs font-bold text-indigo-700">
+                          ₹{labour.toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-5 py-4 text-right text-xs font-bold text-amber-600">
+                          ₹{material.toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-5 py-4 text-right text-xs font-bold text-sky-600">
+                          ₹{machinery.toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-5 py-4 text-right text-xs font-bold text-violet-600">
+                          ₹{expenses.toLocaleString('en-IN')}
+                        </td>
+                        <td className="px-5 py-4 text-right">
+                          <span className="text-xs font-black text-[#1A1A1A]">₹{grand.toLocaleString('en-IN')}</span>
                         </td>
                       </tr>
-                    ))}
-                    {workersList.length === 0 && (
-                      <tr><td colSpan={4} className="p-32 text-center text-slate-300 font-black uppercase text-xs tracking-widest italic bg-white">Resource not found.</td></tr>
-                    )}
-                  </tbody>
-                </table>
-             </div>
-           </Card>
-        </div>
-      )}
-
-      {activeTab === "sites" && (
-        <div className="animate-in fade-in slide-in-from-bottom-6 duration-700">
-           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-             {sites.map(site => (
-                <Link key={site.id} href={`/admin/reports/site/${site.id}`}>
-                  <Card className="hover:shadow-2xl transition-all duration-500 cursor-pointer border-0 shadow-sm rounded-[2.5rem] group relative overflow-hidden bg-white h-full transform hover:-translate-y-2">
-                    <div className={cn("absolute top-6 right-6 px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-white rounded-full shadow-lg", 
-                      site.status === "Completed" ? "bg-emerald-500 shadow-emerald-200" : "bg-maroon-600 shadow-maroon-200")}>
-                       {site.status || "Ongoing"}
-                    </div>
-                    <CardContent className="p-10 text-center space-y-6">
-                      <div className="w-20 h-20 bg-slate-50 text-slate-400 rounded-3xl flex items-center justify-center mx-auto group-hover:bg-maroon-600 group-hover:text-white group-hover:shadow-2xl group-hover:shadow-maroon-200 transition-all duration-500 transform group-hover:-rotate-6">
-                        <Building2 className="w-10 h-10" />
-                      </div>
-                      <div>
-                        <h3 className="font-black text-slate-900 text-xl uppercase leading-tight tracking-tightest">{site.siteName}</h3>
-                        <p className="text-[9px] font-black text-slate-300 mt-4 tracking-[0.2em] uppercase">Investigate Archive</p>
-                      </div>
-                    </CardContent>
-                    <div className={cn("h-2 w-full mt-auto", site.status === "Completed" ? "bg-emerald-500" : "bg-blue-600")} />
-                  </Card>
-                </Link>
-             ))}
-           </div>
-        </div>
-      )}
-
-      {/* Detail Dialogs */}
-      <Dialog open={!!modalType} onOpenChange={() => setModalType(null)}>
-        <DialogContent className="max-w-3xl bg-white shadow-2xl border-0 rounded-[3rem] overflow-hidden p-0">
-          <DialogHeader className="bg-slate-900 p-10 text-white relative">
-            <div className="space-y-2">
-              <DialogTitle className="text-3xl font-black uppercase tracking-tightest flex items-center gap-5">
-                {modalType === "workers" && <><div className="w-12 h-12 bg-maroon-800 rounded-2xl flex items-center justify-center"><Users className="w-7 h-7" /></div> Labour Audit</>}
-                {modalType === "materials" && <><div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center"><PackageSearch className="w-7 h-7" /></div> Stock Ledger</>}
-                {modalType === "expenses" && <><div className="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center"><IndianRupee className="w-7 h-7" /></div> Incidentals</>}
-              </DialogTitle>
-              <DialogDescription className="text-slate-500 font-black uppercase tracking-[0.1em] text-xs pt-4 flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5" />
-                Archive Node: {selectedEntry && format(parseISO(selectedEntry.date), "dd MMMM yyyy")} | {selectedEntry?.time}
-              </DialogDescription>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setModalType(null)} className="absolute top-8 right-8 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl h-12 w-12">
-               <X className="w-6 h-6" />
-            </Button>
-          </DialogHeader>
-          <div className="p-10 max-h-[60vh] overflow-y-auto">
-             {modalType === "workers" && (
-                <div className="overflow-x-auto">
-                   <table className="w-full text-left">
-                     <thead className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                       <tr>
-                         <th className="px-6 py-4">Resource</th>
-                         <th className="px-6 py-4">Designation</th>
-                         <th className="px-6 py-4 text-center">Utilization</th>
-                         <th className="px-6 py-4 text-right">Value</th>
-                         <th className="px-6 py-4 text-right">Accounting</th>
-                       </tr>
-                     </thead>
-                     <tbody className="divide-y divide-slate-50">
-                        {selectedEntry?.workers.map((w, idx) => (
-                          <tr key={idx} className="group hover:bg-slate-50/50 transition-all">
-                            <td className="px-6 py-4 font-black text-slate-900 uppercase tracking-tightest">{w.personName}</td>
-                            <td className="px-6 py-4"><span className="bg-slate-100 px-3 py-1 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-widest">{w.type}</span></td>
-                            <td className="px-6 py-4 text-center font-black text-xs">{w.shift} <span className="text-[9px] text-slate-300">UNITS</span></td>
-                            <td className="px-6 py-4 text-right font-black text-slate-900">₹{w.amount}</td>
-                            <td className="px-6 py-4 text-right">
-                              <span className={cn("text-[9px] px-3 py-1 rounded-full font-black tracking-widest", 
-                                w.paymentStatus === 'Paid' ? 'bg-emerald-50 text-emerald-600' : 
-                                w.paymentStatus === 'Not Paid' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600')}>
-                                {w.paymentStatus.toUpperCase()}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                     </tbody>
-                   </table>
-                </div>
-             )}
+          </Card>
 
-             {modalType === "materials" && (
-                <div className="overflow-x-auto">
-                   <table className="w-full text-left">
-                     <thead className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                       <tr>
-                         <th className="px-6 py-4">Material Identity</th>
-                         <th className="px-6 py-4">Source</th>
-                         <th className="px-6 py-4 text-center">Volume</th>
-                         <th className="px-6 py-4 text-right">Valuation</th>
-                       </tr>
-                     </thead>
-                     <tbody className="divide-y divide-slate-50">
-                        {selectedEntry?.materials.map((m, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50 transition-all">
-                            <td className="px-6 py-4 font-black text-slate-900 uppercase tracking-tightest">{m.materialName}</td>
-                            <td className="px-6 py-4 font-black text-slate-400 uppercase text-[10px] tracking-widest">{m.company}</td>
-                            <td className="px-6 py-4 text-center font-black text-xs bg-slate-50 rounded-2xl mx-6 flex items-center justify-center h-10 mt-2">{m.qty}</td>
-                            <td className="px-6 py-4 text-right font-black text-slate-900 text-base">₹{m.amount}</td>
-                          </tr>
-                        ))}
-                        {selectedEntry?.materials.length === 0 && <tr><td colSpan={4} className="p-32 text-center text-slate-300 font-black uppercase tracking-widest italic">Nil Audit.</td></tr>}
-                     </tbody>
-                   </table>
-                </div>
-             )}
+          {Math.ceil(filteredSites.length / pageSize) > 1 && (
+            <div className="flex justify-center items-center gap-4 py-4">
+              <Button variant="outline" size="sm" className="h-8 rounded-sm text-[10px] font-black uppercase text-blue-950" disabled={currentPage === 1} onClick={() => setCurrentPage(v => v - 1)}>PREV</Button>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">PAGE {currentPage} OF {Math.ceil(filteredSites.length / pageSize)}</span>
+              <Button variant="outline" size="sm" className="h-8 rounded-sm text-[10px] font-black uppercase text-blue-950" disabled={currentPage === Math.ceil(filteredSites.length / pageSize)} onClick={() => setCurrentPage(v => v + 1)}>NEXT</Button>
+            </div>
+          )}
+        </div>
+      )}
 
-             {modalType === "expenses" && (
-                <div className="overflow-x-auto">
-                   <table className="w-full text-left">
-                     <thead className="bg-slate-50 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                       <tr>
-                         <th className="px-6 py-4">Financial Narrative</th>
-                         <th className="px-6 py-4 text-right">Impact</th>
-                       </tr>
-                     </thead>
-                     <tbody className="divide-y divide-slate-50">
-                        {selectedEntry?.expenses.map((ex, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50 transition-all">
-                            <td className="px-6 py-4 font-black text-slate-900 uppercase tracking-tightest">{ex.title}</td>
-                            <td className="px-6 py-4 text-right font-black text-slate-900 text-lg">₹{ex.amount}</td>
-                          </tr>
-                        ))}
-                        {selectedEntry?.expenses.length === 0 && <tr><td colSpan={2} className="p-32 text-center text-slate-300 font-black uppercase tracking-widest italic">Nil Audit.</td></tr>}
-                     </tbody>
-                   </table>
-                </div>
-             )}
-          </div>
-          <div className="p-10 bg-slate-50 flex justify-between items-center border-t border-slate-100">
-             <div className="flex gap-10">
-                <div>
-                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Entry Date</p>
-                   <p className="text-sm font-black text-slate-900 uppercase">{selectedEntry && format(parseISO(selectedEntry.date), "dd MMM yyyy")}</p>
-                </div>
-                <div>
-                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Project Index</p>
-                   <p className="text-sm font-black text-maroon-600 uppercase">{sites.find(s => s.id === selectedEntry?.siteId)?.siteName}</p>
+
+      <Dialog open={!!selectedEntry && modalType === "full"} onOpenChange={(o) => (!o ? setSelectedEntry(null) : null)}>
+
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-[#F1F2F4] p-0 border-0 rounded-xl" style={{ borderRadius: '12px' }}>
+          {selectedEntry && (
+             <div className="p-6 space-y-4 font-sans text-[#1A1A1A]">
+               <div className="flex flex-col mb-4 bg-white p-4 rounded-xl shadow-sm border border-[#E5E5E5]">
+                 <h2 className="text-[16px] font-bold text-[#1A1A1A] mb-1">Entry Summary</h2>
+                 <p className="text-[13px] text-[#666] font-medium">
+                    {safeFormatDate(selectedEntry.date)} • {selectedEntry.time} <br/> 
+                    Site: {sites.find(s => s.id === selectedEntry.siteId)?.siteName || 'N/A'}
+                 </p>
+               </div>
+
+               {/* Labour */}
+               {selectedEntry.workers && selectedEntry.workers.length > 0 && (() => {
+                 const aggW = Array.from(selectedEntry.workers!.reduce((m, w) => {
+                   const key = w.personName.trim().toLowerCase();
+                   if (!m.has(key)) m.set(key, { ...w, types: [w.type || "—"], totalAmount: Number(w.amount) || 0, totalLabour: Number(w.labourCount) || 0 });
+                   else {
+                     const item = m.get(key)!;
+                     if (w.type && w.type !== "—") item.types.push(w.type);
+                     item.totalAmount += Number(w.amount) || 0;
+                     item.totalLabour += Number(w.labourCount) || 0;
+                   }
+                   return m;
+                 }, new Map<string, any>()).values());
+
+                 return (
+                 <Card className="rounded-xl border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
+                   <div className="px-4 py-3 bg-[#FAFAFA] border-b border-[#E5E5E5]">
+                     <h3 className="text-[13px] font-semibold text-[#1A1A1A]">Labour ({aggW.length})</h3>
+                   </div>
+                   <div className="divide-y divide-[#E5E5E5]">
+                     {aggW.map((w: any, i: number) => (
+                       <div key={i} className="p-3 px-4 flex justify-between text-[13px] items-center">
+                         <div>
+                            <span className="font-medium text-[#1A1A1A]">{w.personName}</span>
+                            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5 ml-2 uppercase">
+                              {Array.from(new Set(w.types)).join(", ")}
+                              {w.totalLabour > 0 && <span className="ml-1 opacity-70">({w.totalLabour})</span>}
+                            </span>
+                         </div>
+                         <div className="font-medium font-bold text-indigo-700">₹{w.totalAmount.toLocaleString('en-IN')}</div>
+                       </div>
+                     ))}
+                   </div>
+                 </Card>
+                 );
+               })()}
+
+               {/* Materials */}
+               {selectedEntry.materials && selectedEntry.materials.length > 0 && (
+                 <Card className="rounded-xl border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
+                   <div className="px-4 py-3 bg-[#FAFAFA] border-b border-[#E5E5E5]">
+                     <h3 className="text-[13px] font-semibold text-[#1A1A1A]">Materials ({selectedEntry.materials.length})</h3>
+                   </div>
+                   <div className="divide-y divide-[#E5E5E5]">
+                     {selectedEntry.materials.map((m, i) => (
+                       <div key={i} className="p-3 px-4 flex justify-between text-[13px]">
+                         <div>
+                            <span className="font-medium text-[#1A1A1A]">{m.materialName}</span>
+                            <span className="text-[#666] ml-2">{m.qty} qty {m.company ? `• ${m.company}` : ''}</span>
+                         </div>
+                         <div className="font-medium">₹{Number(m.amount || 0).toLocaleString('en-IN')}</div>
+                       </div>
+                     ))}
+                   </div>
+                 </Card>
+               )}
+
+               {/* Machinery */}
+               {selectedEntry.machinery && selectedEntry.machinery.length > 0 && (
+                 <Card className="rounded-xl border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
+                   <div className="px-4 py-3 bg-[#FAFAFA] border-b border-[#E5E5E5]">
+                     <h3 className="text-[13px] font-semibold text-[#1A1A1A]">Machinery ({selectedEntry.machinery.length})</h3>
+                   </div>
+                   <div className="divide-y divide-[#E5E5E5]">
+                     {selectedEntry.machinery.map((m, i) => (
+                       <div key={i} className="p-3 px-4 flex justify-between text-[13px]">
+                         <div>
+                            <span className="font-medium text-[#1A1A1A]">{m.machineryName}</span>
+                            <span className="text-[#666] ml-2">{m.qty} units {m.personName ? `• ${m.personName}` : ''}</span>
+                         </div>
+                         <div className="font-medium">₹{Number(m.amount || 0).toLocaleString('en-IN')}</div>
+                       </div>
+                     ))}
+                   </div>
+                 </Card>
+               )}
+
+               {/* Expenses */}
+               {selectedEntry.expenses && selectedEntry.expenses.length > 0 && (
+                 <Card className="rounded-xl border-[#E5E5E5] bg-white overflow-hidden shadow-sm">
+                   <div className="px-4 py-3 bg-[#FAFAFA] border-b border-[#E5E5E5]">
+                     <h3 className="text-[13px] font-semibold text-[#1A1A1A]">Expenses ({selectedEntry.expenses.length})</h3>
+                   </div>
+                   <div className="divide-y divide-[#E5E5E5]">
+                     {selectedEntry.expenses.map((e, i) => (
+                       <div key={i} className="p-3 px-4 flex justify-between text-[13px]">
+                         <span className="font-medium text-[#1A1A1A]">{e.title}</span>
+                          <div className="font-medium">₹{Number(e.amount || 0).toLocaleString('en-IN')}</div>
+                       </div>
+                     ))}
+                   </div>
+                 </Card>
+               )}
+
+                <div className="pt-4 flex justify-between items-center text-[16px] font-bold text-[#1A1A1A] bg-white p-4 rounded-xl shadow-sm border border-[#E5E5E5]">
+                  <span>FINAL TOTAL</span>
+                  <span>
+                    {(() => {
+                      const l = (selectedEntry.workers || []).reduce((s, w) => s + (Number(w.amount) || 0), 0);
+                      const m = (selectedEntry.materials || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                      const eq = (selectedEntry.machinery || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                      const ex = (selectedEntry.expenses || []).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+                      return `₹${(l + m + eq + ex).toLocaleString('en-IN')}`;
+                    })()}
+                  </span>
                 </div>
              </div>
-             <div className="text-right">
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Aggregate Settlement</p>
-                <p className="text-2xl font-black text-slate-900 tracking-tightest">₹{selectedEntry?.totalAmount?.toLocaleString()}</p>
-             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
+      
+      {/* DELETE CONFIRMATION */}
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={(o) => !o && setDeleteConfirmId(null)}>
+        <AlertDialogContent className="rounded-sm bg-card border-border/40">
+           <AlertDialogHeader>
+              <AlertDialogTitle className="text-blue-950 uppercase font-black text-lg tracking-tight">ERASE RECORD PERMANENTLY?</AlertDialogTitle>
+              <AlertDialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                 THIS WILL REMOVE THE DAILY LOG ENTRY FROM THE SYSTEM FOREVER. THIS ACTION CANNOT BE UNDONE.
+              </AlertDialogDescription>
+           </AlertDialogHeader>
+           <AlertDialogFooter>
+              <AlertDialogCancel className="h-10 rounded-sm text-[10px] font-black uppercase tracking-widest text-blue-950">KEEP RECORD</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteEntry} className="h-10 rounded-sm bg-destructive text-white text-[10px] font-black uppercase tracking-widest">DELETE ENTRY</AlertDialogAction>
+           </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,61 +1,80 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X, Building2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/services", label: "Services" },
-  { href: "/projects", label: "Projects" },
-  { href: "/contact", label: "Contact" },
+  { href: "#home", label: "Home" },
+  { href: "#about", label: "About" },
+  { href: "#services", label: "Services" },
+  { href: "#workflow", label: "Process" },
+  { href: "#contact", label: "Contact" },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 lg:h-20">
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? "bg-[#fcfbfe]/95 backdrop-blur-xl border-b border-[#e8e4de] py-2 shadow-sm" 
+          : "bg-transparent py-4"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+        <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-12 h-12 relative overflow-hidden rounded-xl shadow-lg group-hover:shadow-maroon-600/40 transition-all duration-300">
+          <Link href="/" className="flex items-center group">
+            <div className="relative flex items-center justify-center w-36 sm:w-48 h-12 sm:h-14">
               <img 
-                src="/logo.jpg" 
+                src="/logo.png" 
                 alt="SS Construction Logo" 
-                className="w-full h-full object-contain bg-white"
+                className="w-full h-full object-contain scale-[1.6] sm:scale-[1.8] mix-blend-multiply"
               />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold text-slate-900 tracking-tight leading-none">
-                SS Construction
-              </span>
-              <span className="text-[10px] text-slate-500 tracking-widest uppercase">
-                Building Excellence
-              </span>
             </div>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-maroon-600 rounded-lg hover:bg-maroon-50/80 transition-all duration-200"
+                className="px-4 py-2 text-[13px] font-medium text-[#6b7280] hover:text-[#1a1a2e] rounded-lg hover:bg-[#1a1a2e]/[0.04] transition-all duration-200"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
-            <Link href="/admin" className="ml-2">
+            <Link href="/admin" className="ml-4">
               <Button
                 size="sm"
-                className="bg-gradient-to-r from-maroon-600 to-maroon-700 hover:from-maroon-800 hover:to-maroon-900 text-white shadow-lg shadow-maroon-600/20 hover:shadow-maroon-600/40 transition-all duration-300 rounded-xl"
+                className="bg-[#9b2c2c] hover:bg-[#822727] text-white shadow-md shadow-[#9b2c2c]/15 hover:shadow-[#9b2c2c]/25 transition-all duration-300 rounded-lg font-semibold border-0 text-[13px] h-9 px-5"
               >
-                Admin Login
+                Sign In
+              </Button>
+            </Link>
+          </div>
+
+          {/* Mobile Center Sign In */}
+          <div className="absolute left-1/2 -translate-x-1/2 md:hidden">
+            <Link href="/admin">
+              <Button
+                size="sm"
+                className="bg-[#9b2c2c] hover:bg-[#822727] text-white shadow-md shadow-[#9b2c2c]/20 transition-all duration-300 rounded-lg font-semibold border-0 text-[11px] h-7 px-4"
+              >
+                Sign In
               </Button>
             </Link>
           </div>
@@ -63,12 +82,12 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-xl hover:bg-slate-100 transition-colors"
+            className="md:hidden p-2 rounded-xl text-[#1a1a2e] hover:bg-[#1a1a2e]/5 transition-colors"
           >
             {isOpen ? (
-              <X className="w-5 h-5 text-slate-700" />
+              <X className="w-6 h-6" />
             ) : (
-              <Menu className="w-5 h-5 text-slate-700" />
+              <Menu className="w-6 h-6" />
             )}
           </button>
         </div>
@@ -76,23 +95,18 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-slate-200/60 animate-in slide-in-from-top-5">
-          <div className="px-4 py-4 space-y-1">
+        <div className="md:hidden bg-[#fcfbfe]/98 backdrop-blur-2xl border-t border-[#e8e4de]">
+          <div className="px-6 py-6 space-y-1">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className="block px-4 py-3 text-sm font-medium text-slate-600 hover:text-maroon-600 rounded-xl hover:bg-maroon-50/80 transition-all"
+                className="block px-4 py-3 text-base font-medium text-[#6b7280] hover:text-[#1a1a2e] rounded-xl hover:bg-[#1a1a2e]/[0.04] transition-all"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
-            <Link href="/admin" onClick={() => setIsOpen(false)}>
-              <Button className="w-full mt-2 bg-gradient-to-r from-maroon-600 to-maroon-700 rounded-xl">
-                Admin Login
-              </Button>
-            </Link>
           </div>
         </div>
       )}
