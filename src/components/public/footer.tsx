@@ -14,7 +14,7 @@ export default function Footer() {
                 <img src="/logo.png" alt="SS Construction Logo" className="w-full h-full object-contain scale-[1.8]" />
               </div>
             </div>
-            <p className="text-sm text-white/45 leading-[1.7]">
+            <p className="text-sm text-white/80 leading-[1.7]">
               Building strong foundations for the future. We deliver excellence
               in every project, from residential to commercial construction.
             </p>
@@ -35,7 +35,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-sm text-white/45 hover:text-[#b7791f] transition-colors font-medium"
+                    className="text-sm text-white/80 hover:text-[#b7791f] transition-colors font-medium"
                   >
                     {link.name}
                   </a>
@@ -58,7 +58,7 @@ export default function Footer() {
                 "Labour Contract",
               ].map((service) => (
                 <li key={service}>
-                  <span className="text-sm text-white/45 font-medium">{service}</span>
+                  <span className="text-sm text-white/80 font-medium">{service}</span>
                 </li>
               ))}
             </ul>
@@ -72,17 +72,17 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#b7791f] mt-0.5 shrink-0" />
-                <span className="text-sm text-white/45 leading-relaxed">
+                <span className="text-sm text-white/80 leading-relaxed">
                   Sadayappa Complex, First Floor, Shop No.3, 19th Road, Kollampalayam Bypass, Erode.
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-[#b7791f] shrink-0" />
-                <span className="text-sm text-white/45">+91 94869 87424</span>
+                <span className="text-sm text-white/80">+91 94869 87424</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-[#b7791f] shrink-0" />
-                <span className="text-sm text-white/45 break-all">
+                <span className="text-sm text-white/80 break-all">
                   ssconstructionerode01@gmail.com
                 </span>
               </li>
@@ -92,10 +92,10 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/8 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-white/30 font-medium">
+          <p className="text-xs text-white/60 font-medium">
             &copy; {new Date().getFullYear()} SS Construction. All rights reserved.
           </p>
-          <p className="text-xs text-white/30 font-medium">
+          <p className="text-xs text-white/60 font-medium">
             Designed with excellence
           </p>
         </div>

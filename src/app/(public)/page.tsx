@@ -157,10 +157,7 @@ const constructionMethods = [
 
 export default function LandingPage() {
   return (
-    <div 
-      className="overflow-hidden font-sans text-[#4a5568] bg-[#c59261] bg-fixed bg-cover bg-center"
-      style={{ backgroundImage: "url('/design.png')" }}
-    >
+    <div className="overflow-hidden font-sans text-[#4a5568] bg-amber-50">
       
       {/* ═══════════════════════════════════════════════════
           1. HERO SECTION
@@ -177,7 +174,7 @@ export default function LandingPage() {
             <span className="text-[#9b2c2c]">one foundation</span> at a time.
           </h1>
 
-          <p className="text-base sm:text-lg text-[#6b7280] font-normal max-w-lg mx-auto mb-14 leading-[1.7]">
+          <p className="text-base sm:text-lg text-[#374151] font-normal max-w-lg mx-auto mb-14 leading-[1.7]">
             Premium residential & commercial construction in Tamil Nadu — where architectural vision meets uncompromising structural integrity.
           </p>
 
@@ -222,7 +219,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           2. ABOUT SECTION
        ═══════════════════════════════════════════════════ */}
-      <section id="about" className="py-16 lg:py-20">
+      <section id="about" className="py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="relative">
@@ -244,7 +241,7 @@ export default function LandingPage() {
                 A Legacy of Structural
                 <br /> Excellence & Trust.
               </h2>
-              <p className="text-base text-[#6b7280] leading-[1.75] mb-8">
+              <p className="text-base text-[#374151] leading-[1.75] mb-8">
                 Founded by <strong className="text-[#1a1a2e] font-semibold">Sankar</strong>, SS Construction has grown rapidly over the last 4 years by strictly adhering to core engineering principles and ethical construction practices. We don&apos;t just build structures; we shape the environments that inspire and elevate lives.
               </p>
               
@@ -269,7 +266,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           3. SERVICES SECTION
        ═══════════════════════════════════════════════════ */}
-      <section id="services" className="py-16 lg:py-20">
+      <section id="services" className="py-16 lg:py-20 bg-amber-50">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-semibold tracking-[0.15em] uppercase text-[#b7791f] mb-3">What we offer</span>
@@ -299,7 +296,7 @@ export default function LandingPage() {
                   <h3 className="text-xl font-bold text-[#1a1a2e] mb-3 tracking-tight group-hover:text-[#b7791f] transition-colors duration-300">
                     {service.title}
                   </h3>
-                  <p className="text-[#6b7280] text-[15px] leading-relaxed">
+                  <p className="text-[#374151] text-[15px] leading-relaxed">
                     {service.desc}
                   </p>
                 </div>
@@ -313,14 +310,14 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           5. WORKFLOW SECTION (dark)
        ═══════════════════════════════════════════════════ */}
-      <section id="workflow" className="py-16 lg:py-20 overflow-hidden">
+      <section id="workflow" className="py-16 lg:py-20 overflow-hidden ">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <span className="inline-block text-xs font-semibold tracking-[0.15em] uppercase text-[#b7791f] mb-3">Process</span>
             <h2 className="text-3xl lg:text-[2.75rem] font-bold text-[#1a1a2e] tracking-tight">
               Our 5-Phase Workflow
             </h2>
-            <p className="mt-5 text-base text-[#6b7280] leading-[1.7] max-w-2xl mx-auto">
+            <p className="mt-5 text-base text-[#374151] leading-[1.7] max-w-2xl mx-auto">
               A methodical, transparent, and rigorous approach ensures every project is delivered on time with zero quality compromise.
             </p>
           </div>
@@ -383,7 +380,7 @@ export default function LandingPage() {
               <h2 className="text-3xl lg:text-[2.75rem] font-bold text-[#1a1a2e] leading-[1.15]">
                 Advanced Construction Methods.
               </h2>
-              <p className="mt-5 text-base text-[#6b7280] leading-[1.7]">
+              <p className="mt-5 text-base text-[#374151] leading-[1.7]">
                 We employ modern techniques and standardized processes that guarantee structural safety, durability, and a premium finish that lasts generations.
               </p>
             </div>
@@ -398,7 +395,7 @@ export default function LandingPage() {
                     <span className="text-4xl font-black text-[#f0ede8]">{method.id}</span>
                   </div>
                   <h4 className="text-lg font-bold text-[#1a1a2e] mb-2 tracking-tight">{method.title}</h4>
-                  <p className="text-[#6b7280] leading-[1.7] text-sm">
+                  <p className="text-[#374151] leading-[1.7] text-sm">
                     {method.desc}
                   </p>
                 </div>
@@ -411,12 +408,12 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           7. CONTACT SECTION
        ═══════════════════════════════════════════════════ */}
-      <section id="contact" className="py-16 lg:py-24">
+      <section id="contact" className="py-16 lg:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-10 text-center">
           <h2 className="text-4xl lg:text-[4rem] font-bold text-[#1a1a2e] tracking-tight mb-5 uppercase">
             Get In Touch
           </h2>
-          <p className="text-base text-[#6b7280] max-w-3xl mx-auto mb-16 leading-[1.7]">
+          <p className="text-base text-[#374151] max-w-3xl mx-auto mb-16 leading-[1.7]">
             Reach out to us directly through any of the channels below. We are ready to answer your questions and start planning your next construction journey.
           </p>
           
@@ -426,13 +423,13 @@ export default function LandingPage() {
               { icon: MapPin, label: "Address", value: "Sadayappa Complex, First Floor, Shop No.3, Kollampalayam Bypass, Erode." },
               { icon: Phone, label: "Call", value: "+91 94869 87424" },
             ].map((item, i) => (
-              <div key={i} className="bg-white border border-[#e8e4de] p-6 flex items-start gap-5 shadow-sm hover:shadow-md transition-shadow duration-300 h-full">
+              <div key={i} className="bg-amber-50 border border-[#e8e4de] p-6 flex items-start gap-5 shadow-sm hover:shadow-md transition-shadow duration-300 h-full">
                 <div className="w-14 h-14 bg-[#b7791f] flex items-center justify-center shrink-0">
                   <item.icon className="w-6 h-6 text-white" strokeWidth={2.5} />
                 </div>
                 <div className="flex flex-col pt-0.5 min-w-0 flex-1">
                   <h4 className="font-bold text-[#1a1a2e] text-lg mb-1">{item.label}</h4>
-                  <p className="text-[#6b7280] text-[13px] sm:text-sm leading-relaxed break-words overflow-wrap-anywhere">
+                  <p className="text-[#374151] text-[13px] sm:text-sm leading-relaxed break-words overflow-wrap-anywhere">
                     {item.value}
                   </p>
                 </div>
