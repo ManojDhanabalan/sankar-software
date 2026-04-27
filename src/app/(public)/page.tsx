@@ -163,50 +163,56 @@ export default function LandingPage() {
           1. HERO SECTION
           Clean, centered layout inspired by modern SaaS sites
        ═══════════════════════════════════════════════════ */}
-      <section id="home" className="relative min-h-[92vh] flex flex-col items-center justify-center pt-28 pb-16 overflow-hidden  ">
+      <section id="home" className="relative min-h-[85vh] sm:min-h-[92vh] flex flex-col items-center justify-center pt-20 sm:pt-28 pb-2 sm:pb-16 overflow-hidden  ">
         
-        <div className="relative z-10 w-full max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
+        <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center">
           
           {/* Hero headline — elegant serif-weight, deep charcoal */}
-          <h1 className="text-[2.5rem] sm:text-[3.25rem] md:text-[4rem] lg:text-[5rem] font-bold text-[#1a1a2e] tracking-[-0.02em] leading-[1.08] mb-6 max-w-4xl">
+          <h1 className="text-[2.25rem] sm:text-[3.25rem] md:text-[4rem] lg:text-[5rem] font-bold text-[#1a1a2e] tracking-[-0.02em] leading-[1.1] mb-6 max-w-4xl">
             Building the future,
-            <br className="hidden sm:block" />
+            <br />
             <span className="text-[#9b2c2c]">one foundation</span> at a time.
           </h1>
 
-          <p className="text-base sm:text-lg text-[#374151] font-normal max-w-lg mx-auto mb-14 leading-[1.7]">
+          <p className="text-sm sm:text-lg text-[#374151] font-normal max-w-lg mx-auto mb-10 sm:mb-14 leading-[1.7] px-2 sm:px-0">
             Premium residential & commercial construction in Tamil Nadu — where architectural vision meets uncompromising structural integrity.
           </p>
 
           {/* Overlapping Fan of Images */}
-          <div className="relative w-full max-w-4xl mx-auto h-[220px] sm:h-[320px] mb-14 flex justify-center items-center">
+          <div className="relative w-full max-w-4xl mx-auto h-[180px] sm:h-[320px] mb-8 sm:mb-14 flex justify-center items-center">
             
             {/* Floating Tags */}
-            <div className="absolute top-2 left-[8%] sm:left-[14%] bg-[#1a1a2e] text-white px-4 py-2 rounded-full font-medium text-xs sm:text-sm -rotate-12 z-40 shadow-md hidden sm:block tracking-wide">
+            <div className="absolute -top-3 sm:top-2 left-[2%] sm:left-[14%] bg-[#1a1a2e] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-[10px] sm:text-sm -rotate-12 z-40 shadow-md tracking-wide">
               #architecture
             </div>
-            <div className="absolute top-0 right-[8%] sm:right-[14%] bg-[#b7791f] text-white px-4 py-2 rounded-full font-medium text-xs sm:text-sm rotate-[10deg] z-40 shadow-md hidden sm:block tracking-wide">
+            <div className="absolute -top-4 sm:top-0 right-[2%] sm:right-[14%] bg-[#b7791f] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-[10px] sm:text-sm rotate-[10deg] z-40 shadow-md tracking-wide">
               #premium
+            </div>
+            <div className="absolute -bottom-2 sm:bottom-4 left-[5%] sm:left-[18%] bg-white text-[#1a1a2e] border border-[#e8e4de] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-bold text-[10px] sm:text-sm rotate-[8deg] z-40 shadow-md tracking-wide">
+              #trusted
+            </div>
+            <div className="absolute -bottom-4 sm:bottom-2 right-[5%] sm:right-[16%] bg-[#9b2c2c] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-[10px] sm:text-sm -rotate-[12deg] z-40 shadow-md tracking-wide">
+              #excellence
             </div>
 
             {/* Far Left */}
-            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[200%] sm:-translate-x-[230%] -rotate-[15deg] w-[110px] sm:w-[200px] aspect-[4/5] rounded-2xl overflow-hidden shadow-lg z-10 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
+            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[160%] sm:-translate-x-[230%] -rotate-[12deg] sm:-rotate-[15deg] w-[85px] sm:w-[200px] aspect-[4/5] rounded-2xl overflow-hidden shadow-lg z-10 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
               <img src="/hero_carousel_1.png" className="w-full h-full object-cover" alt="Construction site" />
             </div>
             {/* Mid Left */}
-            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[120%] sm:-translate-x-[130%] -rotate-[8deg] w-[120px] sm:w-[220px] aspect-[4/5] rounded-2xl overflow-hidden shadow-xl z-20 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
+            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[85%] sm:-translate-x-[130%] -rotate-[4deg] sm:-rotate-[8deg] w-[85px] sm:w-[220px] aspect-[4/5] rounded-2xl overflow-hidden shadow-xl z-20 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
               <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Luxury villa" />
             </div>
             {/* Center — largest, deepest shadow */}
-            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-[140px] sm:w-[260px] aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(26,26,46,0.18)] z-30 transition-transform duration-500 hover:-translate-y-8 hover:scale-[1.03] border-2 border-white">
+            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-[15%] sm:-translate-x-1/2 rotate-[4deg] sm:rotate-0 w-[85px] sm:w-[260px] aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_16px_48px_rgba(26,26,46,0.18)] z-30 transition-transform duration-500 hover:-translate-y-8 hover:scale-[1.03] border-2 border-white">
               <img src="/hero_carousel_2.png" className="w-full h-full object-cover" alt="Architect reviewing plans" />
             </div>
             {/* Mid Right */}
-            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 translate-x-[20%] sm:translate-x-[30%] rotate-[8deg] w-[120px] sm:w-[220px] aspect-[4/5] rounded-2xl overflow-hidden shadow-xl z-20 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
+            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 translate-x-[60%] sm:translate-x-[30%] rotate-[12deg] sm:rotate-[8deg] w-[85px] sm:w-[220px] aspect-[4/5] rounded-2xl overflow-hidden shadow-xl z-20 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
               <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80" className="w-full h-full object-cover" alt="Modern apartments" />
             </div>
             {/* Far Right */}
-            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 translate-x-[100%] sm:translate-x-[130%] rotate-[15deg] w-[110px] sm:w-[200px] aspect-[4/5] rounded-2xl overflow-hidden shadow-lg z-10 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60">
+            <div className="absolute left-1/2 top-1/2 -translate-y-1/2 translate-x-[100%] sm:translate-x-[130%] rotate-[15deg] w-[110px] sm:w-[200px] aspect-[4/5] rounded-2xl overflow-hidden shadow-lg z-10 transition-transform duration-500 hover:-translate-y-8 hover:z-50 hover:rotate-0 border border-white/60 hidden sm:block">
               <img src="/hero_carousel_3.png" className="w-full h-full object-cover" alt="Modern building" />
             </div>
           </div>
@@ -219,7 +225,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════
           2. ABOUT SECTION
        ═══════════════════════════════════════════════════ */}
-      <section id="about" className="py-16 lg:py-20 bg-white">
+      <section id="about" className="py-6 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="relative">

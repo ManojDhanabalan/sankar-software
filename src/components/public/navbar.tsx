@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 
 const navLinks = [
   { href: "#home", label: "Home" },
@@ -16,6 +17,7 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,15 +35,15 @@ export default function Navbar() {
           : "bg-transparent py-4"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+      <div className="max-w-7xl mx-auto px- sm:px-8 lg:px-10">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center group">
-            <div className="relative flex items-center justify-center w-36 sm:w-48 h-12 sm:h-14">
+            <div className="relative flex items-center justify-center pl-3 sm:w-48 h-12 sm:h-14">
               <img 
                 src="/logo.png" 
                 alt="SS Construction Logo" 
-                className="w-full h-full object-contain scale-[1.6] sm:scale-[1.8] mix-blend-multiply"
+                className="w-full h-full object-contain scale-[2] sm:scale-[2.1] mix-blend-multiply"
               />
             </div>
           </Link>
@@ -57,27 +59,31 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <Link href="/admin" className="ml-4">
-              <Button
-                size="sm"
-                className="bg-[#9b2c2c] hover:bg-[#822727] text-white shadow-md shadow-[#9b2c2c]/15 hover:shadow-[#9b2c2c]/25 transition-all duration-300 rounded-lg font-semibold border-0 text-[13px] h-9 px-5"
-              >
-                Sign In
-              </Button>
-            </Link>
+            {isAdmin && (
+              <Link href="/admin" className="ml-4">
+                <Button
+                  size="sm"
+                  className="bg-[#9b2c2c] hover:bg-[#822727] text-white shadow-md shadow-[#9b2c2c]/15 hover:shadow-[#9b2c2c]/25 transition-all duration-300 rounded-lg font-semibold border-0 text-[13px] h-9 px-5"
+                >
+                  Dashboard
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Center Sign In */}
-          <div className="absolute left-1/2 -translate-x-1/2 md:hidden">
-            <Link href="/admin">
-              <Button
-                size="sm"
-                className="bg-[#9b2c2c] hover:bg-[#822727] text-white shadow-md shadow-[#9b2c2c]/20 transition-all duration-300 rounded-lg font-semibold border-0 text-[11px] h-7 px-4"
-              >
-                Sign In
-              </Button>
-            </Link>
-          </div>
+          {isAdmin && (
+            <div className="absolute left-1/2 -translate-x-1/2 md:hidden">
+              <Link href="/admin">
+                <Button
+                  size="sm"
+                  className="bg-[#9b2c2c] hover:bg-[#822727] text-white shadow-md shadow-[#9b2c2c]/20 transition-all duration-300 rounded-lg font-semibold border-0 text-[11px] h-7 px-4"
+                >
+                  Dashboard
+                </Button>
+              </Link>
+            </div>
+          )}
 
           {/* Mobile Toggle */}
           <button
